@@ -1,5 +1,5 @@
 # *************************************************************************** #
-#                      MAKEFILE FOR BASIC C++ PROGRAMS                        # 
+#                      MAKEFILE FOR BASIC C++ PROGRAMS                        #
 # *************************************************************************** #
 
 # ---------------- Compiler Options;
@@ -19,7 +19,7 @@ executableFull = $(executable)
 # ----------------
 ifeq ($(DEBUG), 1)
 	optLevel = -O0
-	CXXFLAGS += -g -DDEBUG 
+	CXXFLAGS += -g -DDEBUG
 	LDFLAGS += -g -DDEBUG
 endif
 
@@ -58,5 +58,5 @@ clean:
 	$(RM) $(OBJS)
 
 dist-clean: clean
-	$(RM) $(DEPS) 
+	$(RM) $(DEPS)
 
