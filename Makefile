@@ -5,7 +5,7 @@
 # ---------------- Compiler Options;
 CXX = g++
 RM  = rm -f
-LDFLAGS =
+LDFLAGS = -Wall
 
 DEBUG = 0
 
@@ -23,7 +23,7 @@ ifeq ($(DEBUG), 1)
 	LDFLAGS += -g -DDEBUG
 endif
 
-CXXFLAGS += $(includes) $(optLevel) $(cxxStd)
+CXXFLAGS += -Wall $(includes) $(optLevel) $(cxxStd)
 
 # object_dir = ./obj
 SRCS = $(wildcard *.cpp)
