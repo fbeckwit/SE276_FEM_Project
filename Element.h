@@ -31,11 +31,13 @@ public:
 
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
-  Element( ) : nodes{ nullptr, nullptr }
+  Element( ) : nodes{ nullptr, nullptr }, length{0.0}
   { }
 
-  Element( Node *n1, Node *n2 ) : nodes{ n1, n2 }
-  { }
+  Element( Node *n0, Node *n1 ) : nodes{ n0, n1 }
+  {
+    length = n1->get_coord( ) - n0->get_coord( );
+  }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
@@ -61,14 +63,6 @@ public:
    */
   void print_nodes( std::ostream &out = std::cout );
 
-private:
-
-  /* ************************  PRIVATE DATA MEMBERS  ************************ */
-
-  std::array<Node *, NEN> nodes;
-
-  /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
-
   /* calc_coord( )
    * Given the parametric coordinate, xi, interpolate the coordinate within the
    * element.
@@ -93,7 +87,16 @@ private:
    * Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B.
    */
-  Eigen::MatrixXd get_gradient_matrix( double xi, unsigned int a );
+  Eigen::Vector2d get_gradient_matrix( double xi, unsigned int a );
+
+private:
+
+  /* ************************  PRIVATE DATA MEMBERS  ************************ */
+
+  std::array<Node *, NEN> nodes;
+  double length;
+
+  /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
 };
 

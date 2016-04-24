@@ -61,7 +61,7 @@ void Element::print_nodes( std::ostream &out )
     out << nodes[ a ]->get_coord( ) << '\n';
 }
 
-/* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
+/* -------------------------------------------------------------------------- */
 
 /* calc_coord( )
  * Given the parametric coordinate, xi, interpolate the coordinate within the
@@ -84,7 +84,7 @@ double Element::interp_coord( double xi )
  */
 double Element::shape_func( double xi, unsigned int a )
 {
-  // Determine appropriate value of xi_a;
+  // Determine the appropriate value of xi_a;
   int xi_a = ( a == 0 ) ? -1 : 1;
 
   // Calculate shape function and return;
@@ -97,3 +97,21 @@ double Element::shape_func( double xi, unsigned int a )
  * Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the gradient matrix, B.
  */
+Eigen::Vector2d Element::get_gradient_matrix( double xi, unsigned int a )
+{
+  // Determine the appropriate value of xi_a;
+  int xi_a = ( a == 0 ) ? -1 : 1;
+
+  // Calculate coefficients used in gradient matrix;
+  double radius = interp_coord( xi );
+  double N_a = shape_func( xi, a );
+
+  // Build the gradient matrix;
+  Eigen::Vector2d B_a;
+  B_a[0] = xi_a / length;
+  B_a[1] = N_a / radius;
+
+  return B_a;
+}
+
+/* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
