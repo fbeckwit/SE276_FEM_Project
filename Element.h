@@ -21,7 +21,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
-#include <Eigen/Dense>
+#include <Eigen/LU>
 
 class Element {
 
@@ -68,6 +68,20 @@ private:
   std::array<Node *, NEN> nodes;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
+
+  /* shape_func( )
+   * Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the shape function.
+   */
+  static double shape_func( double xi, unsigned int a );
+
+  /* shape_deriv( )
+   * Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the shape function derivative.
+   */
+  static inline double shape_deriv( unsigned int a ) {
+    return ( a == 0 ) ? -0.5 : 0.5;
+  }
 
 };
 

@@ -62,3 +62,16 @@ void Element::print_nodes( std::ostream &out )
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
+
+/* shape_func( )
+ * Given the parametric coordinate, xi, and the local index of the shape
+ * function, a, return the value of the shape function.
+ */
+double Element::shape_func( double xi, unsigned int a )
+{
+  // Determine appropriate value of xi_a;
+  int xi_a = ( a == 0 ) ? -1 : 1;
+
+  // Calculate shape function and return;
+  return 0.5 * ( 1 + xi_a * xi );
+}
