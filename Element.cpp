@@ -63,6 +63,21 @@ void Element::print_nodes( std::ostream &out )
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
 
+/* calc_coord( )
+ * Given the parametric coordinate, xi, interpolate the coordinate within the
+ * element.
+ */
+double Element::interp_coord( double xi )
+{
+  // Sum N_a * x_a;
+  double coord{0};
+  for( int a{0}; a != NEN; ++a )
+    coord += shape_func( xi, a ) * nodes[a]->get_coord( );
+  return coord;
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* shape_func( )
  * Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function.
@@ -75,3 +90,10 @@ double Element::shape_func( double xi, unsigned int a )
   // Calculate shape function and return;
   return 0.5 * ( 1 + xi_a * xi );
 }
+
+/* -------------------------------------------------------------------------- */
+
+/* get_gradient_matrix( )
+ * Given the parametric coordinate, xi, and the local index of the shape
+ * function, a, return the value of the gradient matrix, B.
+ */

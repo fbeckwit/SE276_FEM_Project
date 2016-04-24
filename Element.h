@@ -69,6 +69,12 @@ private:
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
+  /* calc_coord( )
+   * Given the parametric coordinate, xi, interpolate the coordinate within the
+   * element.
+   */
+  double interp_coord( double xi );
+
   /* shape_func( )
    * Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function.
@@ -82,6 +88,12 @@ private:
   static inline double shape_deriv( unsigned int a ) {
     return ( a == 0 ) ? -0.5 : 0.5;
   }
+
+  /* get_gradient_matrix( )
+   * Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the gradient matrix, B.
+   */
+  Eigen::MatrixXd get_gradient_matrix( double xi, unsigned int a );
 
 };
 
