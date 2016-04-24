@@ -12,8 +12,10 @@
 
 // Project-specific headers;
 #include "Element.h"
+#include "gauss_quadrature.h"
 
 // System headers;
+#include <vector>
 
 /* *****************************  COPY CONTROL  ***************************** */
 
@@ -24,9 +26,49 @@
  * Returns the stiffness matrix for the given element using the current
  * consistent tangent.
  */
-Eigen::MatrixXd Element::get_stiffness( )
+Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 {
-  return Eigen::MatrixXd( );
+  // Get elastic modulii tensor;
+  // TODO:  Obtain this from a call from material model, hard-coded for now.
+  double E{ 1000 };
+  double nu{ 0.4999 };
+  double lambda = nu * E / (( 1 + nu ) * ( 1 - 2 * nu ));
+  double G = E / 2.0 / ( 1 + nu );
+
+  Eigen::Matrix<double, 2, 2> elastic_mod;
+  elastic_mod( 0, 0 ) = elastic_mod( 1, 1 ) = lambda + 2 * G;
+  elastic_mod( 0, 1 ) = elastic_mod( 1, 0 ) = lambda;
+
+  // Get Gauss points and weights, and the values of radius at the points;
+  std::vector<double> gauss_pts = util::gauss_pts( int_order );
+  std::vector<double> gauss_wts = util::gauss_wts( int_order );
+  std::vector<double> func_eval( int_order );
+  std::vector<double> radius( int_order );
+  for( std::size_t pt{ 0 }; pt != int_order; ++pt )
+    radius[pt] = interp_coord( gauss_pts[pt] );
+
+  // Calculate the stiffness matrix;
+  Eigen::MatrixXd stiffness( NEN, NEN );
+  for( std::size_t a{ 0 }; a != NEN; ++a ) {
+    for( std::size_t b{ a }; b != NEN; ++b) {
+
+      // Calculate k_{ab}.  Get function evaluations;
+      for( std::size_t pt{ 0 }; pt != int_order; ++pt) {
+        Eigen::Vector2d B_a = get_gradient_matrix( gauss_pts[pt], a );
+        Eigen::Vector2d B_b = get_gradient_matrix( gauss_pts[pt], b );
+
+        func_eval[pt] = ( B_a.transpose( ) * elastic_mod * B_b ).value( );
+        func_eval[pt] *= radius[pt] * length / 2.0;
+      }
+      stiffness( a, b ) = util::integrate( func_eval, gauss_wts );
+
+      // If we're calculating off-diagonal terms, copy to the lower triangle;
+      if ( a != b )
+        stiffness( b, a ) = stiffness( a, b );
+    }
+  }
+
+  return stiffness;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -82,7 +124,7 @@ double Element::interp_coord( double xi )
  * Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function.
  */
-double Element::shape_func( double xi, unsigned int a )
+double Element::shape_func( double xi, std::size_t a )
 {
   // Determine the appropriate value of xi_a;
   int xi_a = ( a == 0 ) ? -1 : 1;
@@ -97,7 +139,7 @@ double Element::shape_func( double xi, unsigned int a )
  * Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the gradient matrix, B.
  */
-Eigen::Vector2d Element::get_gradient_matrix( double xi, unsigned int a )
+Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a )
 {
   // Determine the appropriate value of xi_a;
   int xi_a = ( a == 0 ) ? -1 : 1;

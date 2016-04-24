@@ -6,29 +6,46 @@
 #include <iostream>
 #include <cmath>
 
+void print_stiffness( Element & e, std::size_t int_order, std::ostream &out = std::cout )
+{
+  out << "Stiffness(" << int_order << "-pt) = [\n";
+  out << e.get_stiffness( int_order ) << "\n]\n";
+}
+
 int main( int argc, char *argv[] )
 {
 
+  std::size_t num_elem = 1;
   // Create some nodes;
-  Node *n1 = new Node( 2 );
-  Node *n2 = new Node( 4 );
-  Node *n3 = new Node( );
+  std::vector<Node *> nodes;
+  std::vector<Element> elems;
 
-  Element e1( n1, n2 );
-  e1.print_nodes( );
-  double xi_0 = -1.0 / std::sqrt( 3 );
+  double a = 6.0;
+  double b = 9.0;
+  double elem_size = ( b - a ) / num_elem;
+  for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
+    nodes.push_back( new Node( a + node_i * elem_size ));
+
+    if( node_i > 0 )
+      elems.push_back( Element( nodes[ node_i - 1 ], nodes[ node_i ] ));
+  }
+
+
+  double xi_0 = 0;
   double xi_1 = -xi_0;
 
-  std::cout << "\nB_0(xi_0) = [\n" << e1.get_gradient_matrix( xi_0, 0 ) << "\n]\n";
-  std::cout << "\nB_1(xi_0) = [\n" << e1.get_gradient_matrix( xi_0, 1 ) << "\n]\n";
-  std::cout << "\nB_0(xi_1) = [\n" << e1.get_gradient_matrix( xi_1, 0 ) << "\n]\n";
-  std::cout << "\nB_1(xi_1) = [\n" << e1.get_gradient_matrix( xi_1, 1 ) << "\n]\n";
+  print_stiffness( elems[0], 1 );
+  print_stiffness( elems[0], 2 );
+  print_stiffness( elems[0], 3 );
+  print_stiffness( elems[0], 4 );
 
-  delete n1;
-  delete n2;
-  delete n3;
+  std::cout << "\nB_0(xi_0) = [\n" << elems[0].get_gradient_matrix( xi_0, 0 ) << "\n]\n";
+  std::cout << "\nB_1(xi_0) = [\n" << elems[0].get_gradient_matrix( xi_0, 1 ) << "\n]\n";
+  std::cout << "\nB_0(xi_1) = [\n" << elems[0].get_gradient_matrix( xi_1, 0 ) << "\n]\n";
+  std::cout << "\nB_1(xi_1) = [\n" << elems[0].get_gradient_matrix( xi_1, 1 ) << "\n]\n";
 
-  //util::test( 128 );
+  for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i )
+    delete nodes[node_i];
 
   return 0;
 }

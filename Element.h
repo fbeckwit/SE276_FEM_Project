@@ -19,8 +19,8 @@
 
 // System headers;
 #include <array>
+#include <cstddef>
 #include <iostream>
-#include <vector>
 #include <Eigen/LU>
 
 class Element {
@@ -45,7 +45,7 @@ public:
    * Returns the stiffness matrix for the given element using the current
    * consistent tangent.
    */
-  Eigen::MatrixXd get_stiffness( );
+  Eigen::MatrixXd get_stiffness( std::size_t int_order = 2 );
 
   /* get_force_ext( )
    * Returns the external force acting on the element from tractions and body
@@ -73,13 +73,13 @@ public:
    * Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function.
    */
-  static double shape_func( double xi, unsigned int a );
+  static double shape_func( double xi, std::size_t a );
 
   /* shape_deriv( )
    * Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function derivative.
    */
-  static inline double shape_deriv( unsigned int a ) {
+  static inline double shape_deriv( std::size_t a ) {
     return ( a == 0 ) ? -0.5 : 0.5;
   }
 
@@ -87,7 +87,7 @@ public:
    * Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B.
    */
-  Eigen::Vector2d get_gradient_matrix( double xi, unsigned int a );
+  Eigen::Vector2d get_gradient_matrix( double xi, std::size_t a );
 
 private:
 
