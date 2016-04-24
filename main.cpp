@@ -1,5 +1,6 @@
 
 #include "Element.h"
+#include "gauss_quadrature.h"
 #include "Node.h"
 
 #include <iostream>
@@ -18,6 +19,8 @@ int main( int argc, char *argv[] )
   delete n1;
   delete n2;
   delete n3;
+
+  util::test( 128 );
 
   return 0;
 }
