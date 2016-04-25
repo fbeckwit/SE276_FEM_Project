@@ -1,4 +1,5 @@
 
+#include "Domain.h"
 #include "Element.h"
 #include "gauss_quadrature.h"
 #include "Material.h"
