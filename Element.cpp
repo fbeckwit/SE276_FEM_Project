@@ -17,6 +17,8 @@
 // System headers;
 #include <vector>
 
+const std::size_t Element::NEN;
+
 /* *****************************  COPY CONTROL  ***************************** */
 
 

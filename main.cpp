@@ -1,6 +1,7 @@
 
 #include "Element.h"
 #include "gauss_quadrature.h"
+#include "Material.h"
 #include "Node.h"
 
 #include <Eigen/LU>
@@ -35,13 +36,11 @@ int main( int argc, char *argv[] )
       nodes.push_back( new Node( a + node_i * elem_size ));
   }
 
-  for( std::size_t ele{ 0 }; ele != num_elem; ++ele )
-    elems.push_back( Element( nodes[ ele ], nodes[ ele + 1 ] ) );
+  Material mat1( 1000, 0.4999999 );
+  std::cout << "mat1(" << &mat1 << ") = [\n" << mat1.get_tangent( ) << "\n]\n";
 
-  print_stiffness( elems[0], 1 );
-  print_stiffness( elems[0], 2 );
-  print_stiffness( elems[0], 3 );
-  print_stiffness( elems[0], 4 );
+  for( std::size_t ele{ 0 }; ele != num_elem; ++ele )
+    elems.push_back( Element( nodes[ ele ], nodes[ ele + 1 ], &mat1 ) );
 
   Eigen::MatrixXd stiff = elems[0].get_stiffness( 1 );
   Eigen::VectorXd force = elems[0].get_force_ext( );

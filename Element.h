@@ -15,6 +15,7 @@
 #define GUARD_ELEMENT_H
 
 // Project-specific headers;
+#include "Material.h"
 #include "Node.h"
 
 // System headers;
@@ -22,21 +23,57 @@
 #include <cstddef>
 #include <iostream>
 #include <Eigen/LU>
+#include <utility>
 
 class Element {
 
 public:
 
-  static const int NEN = 2;
+  static const std::size_t NEN = 2;
 
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
-  Element( ) : nodes{ nullptr, nullptr }, length{0.0}
+  Element( ) : nodes{ nullptr, nullptr }, length{0.0}, material{ nullptr }
   { }
 
-  Element( Node *n0, Node *n1 ) : nodes{ n0, n1 }
+  Element( Node *n0, Node *n1, const Material *mat ) :
+    nodes{ n0, n1 }, length{ 0.0 }, material{ mat->clone( ) }
   {
     length = n1->get_coord( ) - n0->get_coord( );
+    std::cout << "material(" << material << ") = [\n" <<
+      material->get_tangent( ) << "\n]\n";
+  }
+
+  /* Copy Constructor */
+  Element( const Element & other ) :
+    nodes{ other.nodes }, length{ other.length },
+    material{ other.material->clone( ) }
+  {
+    std::cout << "Calling Element copy constructor\n";
+    std::cout << "Material addr: " << material << "\n";
+  }
+
+  /* Move Constructor */
+  Element( Element && other ) :
+    nodes{ std::move( other.nodes ) }, length{ other.length },
+    material{ other.material }
+  {
+    other.nodes = { nullptr, nullptr };
+    other.length = 0.0;
+    other.material = nullptr;
+
+    std::cout << "Calling Element move constructor\n";
+    std::cout << "Material addr: " << material << "\n";
+  }
+
+  /* Assignment operators (Deleted) */
+  Element & operator=( const Element & other ) = delete;
+  Element && operator=( Element && other ) = delete;
+
+  ~Element( )
+  {
+    std::cout << "Deleting material(" << material << ")\n";
+    delete material;
   }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
@@ -93,8 +130,9 @@ private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
-  std::array<Node *, NEN> nodes;
+  std::vector<Node *> nodes;
   double length;
+  Material *material;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
