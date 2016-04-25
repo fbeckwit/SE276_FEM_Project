@@ -34,7 +34,11 @@ public:
   /* ****************************  COPY CONTROL  **************************** */
 
   /* Default constructor */
-  Node( double coord = 0, node_type type = INT, double bc = 0 ) :
+  Node( double coord = 0 ) :
+    coord{ coord }, type{ INT }, disp{ 0 }, bound_cond{ 0 }
+  { }
+
+  Node( double coord, node_type type, double bc ) :
     coord{ coord }, type{ type }, disp{ 0 }, bound_cond{ bc }
   { }
 

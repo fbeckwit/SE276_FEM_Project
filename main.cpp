@@ -3,10 +3,15 @@
 #include "gauss_quadrature.h"
 #include "Node.h"
 
+#include <Eigen/LU>
 #include <iostream>
 #include <cmath>
 
-void print_stiffness( Element & e, std::size_t int_order, std::ostream &out = std::cout )
+void print_stiffness(
+    Element & e,
+    std::size_t int_order,
+    std::ostream &out = std::cout
+    )
 {
   out << "Stiffness(" << int_order << "-pt) = [\n";
   out << e.get_stiffness( int_order ) << "\n]\n";
@@ -24,27 +29,25 @@ int main( int argc, char *argv[] )
   double b = 9.0;
   double elem_size = ( b - a ) / num_elem;
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
-    nodes.push_back( new Node( a + node_i * elem_size ));
-
-    if( node_i > 0 )
-      elems.push_back( Element( nodes[ node_i - 1 ], nodes[ node_i ] ));
+    if( node_i == 0 )
+      nodes.push_back( new Node( a + node_i * elem_size, Node::NBC, 10.0 ) );
+    else
+      nodes.push_back( new Node( a + node_i * elem_size ));
   }
 
-
-  double xi_0 = 0;
-  double xi_1 = -xi_0;
+  for( std::size_t ele{ 0 }; ele != num_elem; ++ele )
+    elems.push_back( Element( nodes[ ele ], nodes[ ele + 1 ] ) );
 
   print_stiffness( elems[0], 1 );
   print_stiffness( elems[0], 2 );
   print_stiffness( elems[0], 3 );
   print_stiffness( elems[0], 4 );
 
-  std::cout << "\nForce(e1) = [\n" << elems[0].get_force_ext( ) << "\n]\n";
+  Eigen::MatrixXd stiff = elems[0].get_stiffness( 1 );
+  Eigen::VectorXd force = elems[0].get_force_ext( );
 
-  std::cout << "\nB_0(xi_0) = [\n" << elems[0].get_gradient_matrix( xi_0, 0 ) << "\n]\n";
-  std::cout << "\nB_1(xi_0) = [\n" << elems[0].get_gradient_matrix( xi_0, 1 ) << "\n]\n";
-  std::cout << "\nB_0(xi_1) = [\n" << elems[0].get_gradient_matrix( xi_1, 0 ) << "\n]\n";
-  std::cout << "\nB_1(xi_1) = [\n" << elems[0].get_gradient_matrix( xi_1, 1 ) << "\n]\n";
+  Eigen::VectorXd disp = stiff.inverse( ) * force;
+  std::cout << disp << "\n";
 
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i )
     delete nodes[node_i];
