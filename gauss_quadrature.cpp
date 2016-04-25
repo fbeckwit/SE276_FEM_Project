@@ -16,10 +16,10 @@
 #include <iostream>
 #include <cmath>
 
-/* gauss_pts( )
+/* get_gauss_pts( )
  * Given the order of integration, return the gauss point locations.
  */
-std::vector<double> util::gauss_pts( int order )
+std::vector<double> util::get_gauss_pts( int order )
 {
   std::vector<double> legendre_roots;
 
@@ -2433,13 +2433,17 @@ std::vector<double> util::gauss_pts( int order )
 
 /* -------------------------------------------------------------------------- */
 
-std::vector<double> util::gauss_pts(
+/* get_gauss_pts( )
+ * Given the integration order and the ends of the integration interval, return
+ * the integration points moved & scaled to the correct interval.
+ */
+std::vector<double> util::get_gauss_pts(
     int order,
     const std::array<double, 2> & interval_ends
     )
 {
   // Get the Gauss points and map them to the new interval;
-  std::vector<double> legendre_roots = gauss_pts( order );
+  std::vector<double> legendre_roots = get_gauss_pts( order );
   double end0 = interval_ends[0];
   double end1 = interval_ends[1];
   double length = end1 - end0;
@@ -2451,10 +2455,10 @@ std::vector<double> util::gauss_pts(
 
 /* -------------------------------------------------------------------------- */
 
-/* gauss_wts( )
+/* get_gauss_wts( )
  * Given the order of integration, return the gauss weights.
  */
-std::vector<double> util::gauss_wts( int order )
+std::vector<double> util::get_gauss_wts( int order )
 {
   std::vector<double> quadrature_weights;
 
@@ -4868,13 +4872,17 @@ std::vector<double> util::gauss_wts( int order )
 
 /* -------------------------------------------------------------------------- */
 
-std::vector<double> util::gauss_wts(
+/* get_gauss_wts( )
+ * Given the integration order and the ends of the integration interval, return
+ * the integration weights scaled to the correct interval.
+ */
+std::vector<double> util::get_gauss_wts(
     int order,
     const std::array<double, 2> & interval_ends
     )
 {
   // Get the Gauss weights and scale them to the physical domain;
-  std::vector<double> weights = gauss_wts( order );
+  std::vector<double> weights = get_gauss_wts( order );
   double length = interval_ends[1] - interval_ends[0];
   for( int i{0}; i != order; ++i )
     weights[i] = weights[i] * length / 2.0;
@@ -4982,8 +4990,8 @@ double util::test_order( int poly_order, int num_intervals )
     ends[0] = i * cell_len;
     ends[1] = (i + 1) * cell_len;
 
-    points = gauss_pts( order, ends );
-    weights = gauss_wts( order, ends );
+    points = get_gauss_pts( order, ends );
+    weights = get_gauss_wts( order, ends );
 
     // loop over gauss points in each interval
     for (int j=0; j<order; ++j)

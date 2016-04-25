@@ -36,8 +36,8 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
   // Get Gauss points and weights, and the values of radius at the points;
   // TODO:  Make Gauss quadrature work on function objects and convert this to
   // utilize that (would remove need to grab Gauss points & weights and others);
-  std::vector<double> gauss_pts = util::gauss_pts( int_order );
-  std::vector<double> gauss_wts = util::gauss_wts( int_order );
+  std::vector<double> gauss_pts = util::get_gauss_pts( int_order );
+  std::vector<double> gauss_wts = util::get_gauss_wts( int_order );
   std::vector<double> func_eval( int_order );
   std::vector<double> radius( int_order );
   for( std::size_t pt{ 0 }; pt != int_order; ++pt )

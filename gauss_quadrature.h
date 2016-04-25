@@ -1,6 +1,6 @@
 //
 //  gauss_quadrature.h
-//  
+//
 //
 //  Created by Jacob Koester on 1/5/15.
 //
@@ -13,14 +13,14 @@
 #include <vector>
 
 namespace util {
-  std::vector<double> gauss_pts( int order );
-  std::vector<double> gauss_pts(
+  std::vector<double> get_gauss_pts( int order );
+  std::vector<double> get_gauss_pts(
       int order,
       const std::array<double, 2> & interval_ends
       );
 
-  std::vector<double> gauss_wts( int order );
-  std::vector<double> gauss_wts(
+  std::vector<double> get_gauss_wts( int order );
+  std::vector<double> get_gauss_wts(
       int order,
       const std::array<double, 2> & interval_ends
       );
