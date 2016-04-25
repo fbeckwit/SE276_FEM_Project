@@ -25,11 +25,22 @@ namespace util {
       const std::array<double, 2> & interval_ends
       );
 
-  //MatrixXd pts_and_wts( int order, VectorXd interval_ends );
-  //MatrixXd pts_and_wts( int order );
-
   double integrate( const std::vector<double> & values,
       const std::vector<double> & weights );
+
+  template <typename Func>
+  double integrate( const Func & f, int int_order )
+  {
+    // Get integration points and weights;
+    std::vector<double> points  = get_gauss_pts( int_order );
+    std::vector<double> weights = get_gauss_wts( int_order );
+
+    // Perform integration;
+    double ret{ 0.0 };
+    for( int pt{ 0 }; pt != int_order; ++pt )
+      ret += f( points[pt] ) * weights[pt];
+    return ret;
+  }
 
   void test( int num_tests );
   double test_order( int poly_order, int num_intervals );
