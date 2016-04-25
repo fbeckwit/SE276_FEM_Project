@@ -39,6 +39,8 @@ int main( int argc, char *argv[] )
   print_stiffness( elems[0], 3 );
   print_stiffness( elems[0], 4 );
 
+  std::cout << "\nForce(e1) = [\n" << elems[0].get_force_ext( ) << "\n]\n";
+
   std::cout << "\nB_0(xi_0) = [\n" << elems[0].get_gradient_matrix( xi_0, 0 ) << "\n]\n";
   std::cout << "\nB_1(xi_0) = [\n" << elems[0].get_gradient_matrix( xi_0, 1 ) << "\n]\n";
   std::cout << "\nB_0(xi_1) = [\n" << elems[0].get_gradient_matrix( xi_1, 0 ) << "\n]\n";

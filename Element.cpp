@@ -79,7 +79,16 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
  */
 Eigen::MatrixXd Element::get_force_ext( )
 {
-  return Eigen::MatrixXd( );
+  Eigen::VectorXd force( 2 );
+
+  // Check if node is on the natural boundary (Node::NBC) and calc the force;
+  for( std::size_t a{ 0 }; a != NEN; ++a ) {
+    if( nodes[a]->get_type( ) == Node::NBC )
+      force[a] = nodes[a]->get_traction( ) * nodes[a]->get_coord( );
+    else
+      force[a] = 0;
+  }
+  return force;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -43,6 +43,8 @@ public:
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
   inline double get_coord( ) { return coord; }
+  inline double get_traction( ) { return ( type == NBC ) ? bound_cond : 0; }
+  inline node_type get_type( ) { return type; }
 
 private:
 
