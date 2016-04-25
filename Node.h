@@ -22,6 +22,8 @@
 
 class Node {
 
+  friend class Element;
+
 public:
 
   /* ****************************  ENUMERATIONS  **************************** */

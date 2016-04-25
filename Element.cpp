@@ -79,8 +79,8 @@ Eigen::MatrixXd Element::get_force_ext( )
 
   // Check if node is on the natural boundary (Node::NBC) and calc the force;
   for( std::size_t a{ 0 }; a != NEN; ++a ) {
-    if( nodes[a]->get_type( ) == Node::NBC )
-      force[a] = nodes[a]->get_traction( ) * nodes[a]->get_coord( );
+    if( nodes[a]->type == Node::NBC )
+      force[a] = nodes[a]->bound_cond * nodes[a]->coord;
     else
       force[a] = 0;
   }
@@ -119,7 +119,7 @@ double Element::interp_coord( double xi )
   // Sum N_a * x_a;
   double coord{0};
   for( int a{0}; a != NEN; ++a )
-    coord += shape_func( xi, a ) * nodes[a]->get_coord( );
+    coord += shape_func( xi, a ) * nodes[a]->coord;
   return coord;
 }
 
