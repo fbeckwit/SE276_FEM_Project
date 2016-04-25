@@ -29,7 +29,7 @@ public:
   /* ****************************  COPY CONTROL  **************************** */
 
   /* Default constructor */
-  Domain( ) : nodes{ }, elements{ }, mats{ }
+  Domain( ) : nodes{ }, elements{ }, materials{ }
   { }
 
   /* Domain should be unique, disallow copy and assignment operators */
@@ -43,13 +43,24 @@ public:
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
+  /* Given material properties, Young's modulus and Poisson's ratio, create an
+   * elastic material and store in `mats.' */
+  void create_mat( double E, double nu );
+
+  /* Given a coordinate, create a node and store in `nodes.' */
+  void create_node( double coord );
+
+  /* Given the node ids and a material id, create an element and store in
+   * `elements.' */
+  void create_elem( std::size_t n0, std::size_t n1, std::size_t mat_id );
+
 private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
   std::vector<Node *> nodes;
   std::vector<Element *> elements;
-  std::vector<Material> mats;
+  std::vector<Material *> materials;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
