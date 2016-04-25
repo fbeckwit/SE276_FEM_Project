@@ -41,7 +41,7 @@ int main( int argc, char *argv[] )
   std::cout << "mat1(" << &mat1 << ") = [\n" << mat1.get_tangent( ) << "\n]\n";
 
   for( std::size_t ele{ 0 }; ele != num_elem; ++ele )
-    elems.push_back( Element( nodes[ ele ], nodes[ ele + 1 ], &mat1 ) );
+    elems.push_back( Element( ele, nodes[ ele ], nodes[ ele + 1 ], &mat1 ) );
 
   Eigen::MatrixXd stiff = elems[0].get_stiffness( 1 );
   Eigen::VectorXd force = elems[0].get_force_ext( );

@@ -35,12 +35,12 @@ public:
   /* ****************************  COPY CONTROL  **************************** */
 
   /* Default constructor */
-  Node( std::size_t ID = 0, double coord = 0 ) :
-    coord{ coord }, type{ INT }, disp{ 0 }, bound_cond{ 0 }, eqn_num{ ID }
+  Node( std::size_t id = 0, double coord = 0 ) :
+    coord{ coord }, type{ INT }, disp{ 0 }, bound_cond{ 0 }, node_ID{ id }
   { }
 
-  Node( std::size_t ID, double coord, node_type type, double bc ) :
-    coord{ coord }, type{ type }, disp{ 0 }, bound_cond{ bc }, eqn_num{ ID }
+  Node( std::size_t id, double coord, node_type type, double bc ) :
+    coord{ coord }, type{ type }, disp{ 0 }, bound_cond{ bc }, node_ID{ id }
   { }
 
   /* Destructor */
@@ -55,11 +55,11 @@ private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
-  double coord;       // Coordinate of the node;
-  node_type type;     // Marker indicating interior or boundary;
-  double disp;        // Current displacement of the node;
-  double bound_cond;  // Boundary condition if node is not interior;
-  std::size_t eqn_num; // Global equation number of node;
+  double coord;         // Coordinate of the node;
+  node_type type;       // Marker indicating interior or boundary;
+  double disp;          // Current displacement of the node;
+  double bound_cond;    // Boundary condition if node is not interior;
+  std::size_t node_ID;  // Global equation number of node;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 

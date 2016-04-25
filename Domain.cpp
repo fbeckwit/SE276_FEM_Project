@@ -62,8 +62,10 @@ void Domain::create_node( double coord )
 void Domain::create_elem( std::size_t n0, std::size_t n1, std::size_t mat_id )
 {
   // Use current size of elements as ID of new element;
-  // std::size_t ele_ID = elements.size( );
-  elements.push_back( new Element( nodes[n0], nodes[n1], materials[mat_id] ) );
+  std::size_t ele_ID = elements.size( );
+  elements.push_back(
+      new Element( ele_ID, nodes[n0], nodes[n1], materials[mat_id] )
+      );
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */

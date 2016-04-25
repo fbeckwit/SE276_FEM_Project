@@ -33,29 +33,31 @@ public:
 
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
-  Element( ) : nodes{ nullptr, nullptr }, length{0.0}, material{ nullptr }
+  Element( ) :
+    nodes{ nullptr, nullptr }, material{ nullptr }, length{0.0}, ele_ID{ 0 }
   { }
 
-  Element( Node *n0, Node *n1, const Material *mat ) :
-    nodes{ n0, n1 }, length{ 0.0 }, material{ mat->clone( ) }
+  Element( std::size_t id, Node *n0, Node *n1, const Material *mat ) :
+    nodes{ n0, n1 }, material{ mat->clone( ) }, length{ 0.0 }, ele_ID{ id }
   {
     length = n1->get_coord( ) - n0->get_coord( );
   }
 
   /* Copy Constructor */
   Element( const Element & other ) :
-    nodes{ other.nodes }, length{ other.length },
-    material{ other.material->clone( ) }
+    nodes{ other.nodes }, material{ other.material->clone( ) },
+    length{ other.length }, ele_ID{ other.ele_ID }
   { }
 
   /* Move Constructor */
   Element( Element && other ) :
-    nodes{ std::move( other.nodes ) }, length{ other.length },
-    material{ other.material }
+    nodes{ std::move( other.nodes ) }, material{ other.material },
+    length{ other.length }, ele_ID{ other.ele_ID }
   {
     other.nodes = { nullptr, nullptr };
-    other.length = 0.0;
     other.material = nullptr;
+    other.length = 0.0;
+    other.ele_ID = 0;
   }
 
   /* Assignment operators (Deleted) */
@@ -97,7 +99,7 @@ public:
   /* Given the local node number (and eventually DOF number), return the global
    * equation number using the `LM' array. */
   inline std::size_t location_matrix( std::size_t a ) const {
-    return nodes[a]->eqn_num;
+    return nodes[a]->node_ID;
   }
 
   /* Given the parametric coordinate, xi, and the local index of the shape
@@ -109,8 +111,9 @@ private:
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
   std::vector<Node *> nodes;
-  double length;
   Material *material;
+  double length;
+  std::size_t ele_ID;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
