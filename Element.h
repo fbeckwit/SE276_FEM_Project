@@ -108,6 +108,14 @@ public:
     return ( a == 0 ) ? -0.5 : 0.5;
   }
 
+  /* location_matrix( )
+   * Given the local node number (and eventually DOF number), return the global
+   * equation number using the `LM' array.
+   */
+  inline std::size_t location_matrix( std::size_t a ) const {
+    return nodes[a]->eqn_num;
+  }
+
   /* get_gradient_matrix( )
    * Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B.

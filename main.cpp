@@ -31,9 +31,9 @@ int main( int argc, char *argv[] )
   double elem_size = ( b - a ) / num_elem;
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
     if( node_i == 0 )
-      nodes.push_back( new Node( a + node_i * elem_size, Node::NBC, 10.0 ) );
+      nodes.push_back( new Node( node_i,  a + node_i * elem_size, Node::NBC, 10.0 ) );
     else
-      nodes.push_back( new Node( a + node_i * elem_size ));
+      nodes.push_back( new Node( node_i,  a + node_i * elem_size ));
   }
 
   Material mat1( 1000, 0.4999999 );
