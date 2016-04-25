@@ -31,17 +31,11 @@ const std::size_t Element::NEN;
 Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 {
   // Get elastic modulii tensor;
-  // TODO:  Obtain this from a call from material model, hard-coded for now.
-  double E{ 1000 };
-  double nu{ 0.4999 };
-  double lambda = nu * E / (( 1 + nu ) * ( 1 - 2 * nu ));
-  double G = E / 2.0 / ( 1 + nu );
-
-  Eigen::Matrix<double, 2, 2> elastic_mod;
-  elastic_mod( 0, 0 ) = elastic_mod( 1, 1 ) = lambda + 2 * G;
-  elastic_mod( 0, 1 ) = elastic_mod( 1, 0 ) = lambda;
+  Eigen::Matrix<double, 2, 2> elastic_mod = material->get_tangent( );
 
   // Get Gauss points and weights, and the values of radius at the points;
+  // TODO:  Make Gauss quadrature work on function objects and convert this to
+  // utilize that (would remove need to grab Gauss points & weights and others);
   std::vector<double> gauss_pts = util::gauss_pts( int_order );
   std::vector<double> gauss_wts = util::gauss_wts( int_order );
   std::vector<double> func_eval( int_order );
