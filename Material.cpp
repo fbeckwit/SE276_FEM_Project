@@ -19,9 +19,7 @@
 
 /* ***********************  PUBLIC MEMBER FUNCTIONS  ************************ */
 
-/* get_tangent( )
- * Return the tangent elastic modulii tensor for the material.
- */
+/* Return the tangent elastic modulii tensor for the material. */
 Eigen::Matrix2d Material::get_tangent( ) const
 {
   // Create the tangent matrix, load the entries and return;

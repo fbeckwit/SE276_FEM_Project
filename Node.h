@@ -29,8 +29,7 @@ public:
   /* ****************************  ENUMERATIONS  **************************** */
 
   /* Enumeration to indicate if node is interior, or if on natural or essential
-   * boundary.
-   */
+   * boundary. */
   enum node_type { INT, EBC, NBC };
 
   /* ****************************  COPY CONTROL  **************************** */

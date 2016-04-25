@@ -41,9 +41,7 @@ public:
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
-  /* get_tangent( )
-   * Return the tangent elastic modulii tensor for the material.
-   */
+  /* Return the tangent elastic modulii tensor for the material. */
   Eigen::Matrix2d get_tangent( ) const;
 
 private:

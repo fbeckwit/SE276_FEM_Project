@@ -24,10 +24,8 @@ const std::size_t Element::NEN;
 
 /* ***********************  PUBLIC MEMBER FUNCTIONS  ************************ */
 
-/* get_stiffness( )
- * Returns the stiffness matrix for the given element using the current
- * consistent tangent.
- */
+/* Returns the stiffness matrix for the given element using the current
+ * consistent tangent. */
 Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 {
   // Get elastic modulii tensor;
@@ -69,10 +67,8 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 
 /* -------------------------------------------------------------------------- */
 
-/* get_force_ext( )
- * Returns the external force acting on the element from tractions and body
- * forces.
- */
+/* Returns the external force acting on the element from tractions and body
+ * forces. */
 Eigen::MatrixXd Element::get_force_ext( )
 {
   Eigen::VectorXd force( 2 );
@@ -89,9 +85,7 @@ Eigen::MatrixXd Element::get_force_ext( )
 
 /* -------------------------------------------------------------------------- */
 
-/* get_force_int( )
- * Returns the internal force acting on the element due to strain energy.
- */
+/* Returns the internal force acting on the element due to strain energy. */
 Eigen::MatrixXd Element::get_force_int( )
 {
   return Eigen::MatrixXd( );
@@ -99,9 +93,7 @@ Eigen::MatrixXd Element::get_force_int( )
 
 /* -------------------------------------------------------------------------- */
 
-/* print_nodes( )
- * Given an output stream, print the node locations.
- */
+/* Given an output stream, print the node locations. */
 void Element::print_nodes( std::ostream &out )
 {
   for ( int a{ 0 }; a != NEN; ++a )
@@ -110,10 +102,8 @@ void Element::print_nodes( std::ostream &out )
 
 /* -------------------------------------------------------------------------- */
 
-/* calc_coord( )
- * Given the parametric coordinate, xi, interpolate the coordinate within the
- * element.
- */
+/* Given the parametric coordinate, xi, interpolate the coordinate within the
+ * element. */
 double Element::interp_coord( double xi )
 {
   // Sum N_a * x_a;
@@ -125,10 +115,8 @@ double Element::interp_coord( double xi )
 
 /* -------------------------------------------------------------------------- */
 
-/* shape_func( )
- * Given the parametric coordinate, xi, and the local index of the shape
- * function, a, return the value of the shape function.
- */
+/* Given the parametric coordinate, xi, and the local index of the shape
+ * function, a, return the value of the shape function.  */
 double Element::shape_func( double xi, std::size_t a )
 {
   // Determine the appropriate value of xi_a;
@@ -140,10 +128,8 @@ double Element::shape_func( double xi, std::size_t a )
 
 /* -------------------------------------------------------------------------- */
 
-/* get_gradient_matrix( )
- * Given the parametric coordinate, xi, and the local index of the shape
- * function, a, return the value of the gradient matrix, B.
- */
+/* Given the parametric coordinate, xi, and the local index of the shape
+ * function, a, return the value of the gradient matrix, B. */
 Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a )
 {
   // Determine the appropriate value of xi_a;
