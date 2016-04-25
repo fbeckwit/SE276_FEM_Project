@@ -35,11 +35,7 @@ public:
     mu = E / 2 / ( 1 + nu );
   }
 
-  Material * clone( ) const
-  {
-    std::cout << "Cloning material " << this << "\n";
-    return new Material( *this );
-  }
+  Material * clone( ) const { return new Material( *this ); }
 
   /* Destructor */
 

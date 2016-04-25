@@ -40,18 +40,13 @@ public:
     nodes{ n0, n1 }, length{ 0.0 }, material{ mat->clone( ) }
   {
     length = n1->get_coord( ) - n0->get_coord( );
-    std::cout << "material(" << material << ") = [\n" <<
-      material->get_tangent( ) << "\n]\n";
   }
 
   /* Copy Constructor */
   Element( const Element & other ) :
     nodes{ other.nodes }, length{ other.length },
     material{ other.material->clone( ) }
-  {
-    std::cout << "Calling Element copy constructor\n";
-    std::cout << "Material addr: " << material << "\n";
-  }
+  { }
 
   /* Move Constructor */
   Element( Element && other ) :
@@ -61,20 +56,13 @@ public:
     other.nodes = { nullptr, nullptr };
     other.length = 0.0;
     other.material = nullptr;
-
-    std::cout << "Calling Element move constructor\n";
-    std::cout << "Material addr: " << material << "\n";
   }
 
   /* Assignment operators (Deleted) */
   Element & operator=( const Element & other ) = delete;
   Element && operator=( Element && other ) = delete;
 
-  ~Element( )
-  {
-    std::cout << "Deleting material(" << material << ")\n";
-    delete material;
-  }
+  ~Element( ) { delete material; }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
