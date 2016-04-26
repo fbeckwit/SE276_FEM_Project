@@ -58,7 +58,8 @@ void Domain::create_node( double coord )
 /* -------------------------------------------------------------------------- */
 
 /* Given the node ids and a material id, create an element and store in
- * `elements.' */
+ * `elements.'
+ * PRECONDITION:  Nodes `n0' and `n1' and material `mat_id' must be created */
 void Domain::create_elem( std::size_t n0, std::size_t n1, std::size_t mat_id )
 {
   // Use current size of elements as ID of new element;
@@ -66,6 +67,75 @@ void Domain::create_elem( std::size_t n0, std::size_t n1, std::size_t mat_id )
   elements.push_back(
       new Element( ele_ID, nodes[n0], nodes[n1], materials[mat_id] )
       );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Builds the stiffness matrix by looping elements and assembling.
+ * PRECONDITION:  `elements' must be instantiated. */
+void Domain::build_stiffness( )
+{
+  // Get number of equations;
+  // TODO:  Generalize to problems with essential boundary conditions.
+  std::size_t NEQ = nodes.size( );
+
+  // Resize the stiffness matrix;
+  stiff.resize( NEQ, NEQ );
+
+  // Loop over elements, get each stiffness and assemble to global stiffness;
+  for( std::vector<Element *>::const_iterator elem_it = elements.begin( );
+      elem_it != elements.end( ); ++elem_it ) {
+    Element * elem = *elem_it;
+
+    Eigen::MatrixXd stiff_elem = elem->get_stiffness( );
+    for( std::size_t a{ 0 }; a != elem->NEN; ++a ) {
+      for( std::size_t b{ 0 }; b != elem->NEN; ++b ) {
+
+        // Check if node is free or not;
+        if( elem->get_node_type( a ) != Node::EBC &&
+            elem->get_node_type( b ) != Node::EBC ) {
+
+          // Get the global index numbers and assemble component to global;
+          std::size_t A = elem->location_matrix( a );
+          std::size_t B = elem->location_matrix( b );
+          stiff( A, B ) += stiff_elem( a, b );
+        }
+      }
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Builds the force vector by looping elements and assembling.
+ * PRECONDITION:  `elements' must be instantiated. */
+void Domain::build_force( )
+{
+  // Get number of equations;
+  // TODO:  Generalize to problems with essential boundary conditions.  Also
+  // make a private function (needed in the above as well).
+  std::size_t NEQ = nodes.size( );
+
+  // Resize the force vector;
+  force.resize( NEQ );
+
+  // Loop over the elements, get each external force and assemble to global;
+  for( std::vector<Element *>::const_iterator elem_it = elements.begin( );
+      elem_it != elements.end( ); ++elem_it ) {
+    Element * elem = *elem_it;
+
+    Eigen::VectorXd force_elem = elem->get_force_ext( );
+    for( std::size_t a{ 0 }; a != elem->NEN; ++a ) {
+
+      // Check if node is free or not;
+      if( elem->get_node_type( a ) != Node::EBC ) {
+
+        // Get the global index number and assemble component to global;
+        std::size_t A = elem->location_matrix( a );
+        force( A ) += force_elem( a );
+      }
+    }
+  }
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
