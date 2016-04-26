@@ -40,7 +40,7 @@ Domain::~Domain( )
 
 /* Given material properties, Young's modulus and Poisson's ratio, create an
  * elastic material and store in `mats.' */
-void Domain::create_mat( double E, double nu )
+void Domain::create_material( double E, double nu )
 {
   materials.push_back( new Material( E, nu ) );
 }
@@ -55,12 +55,24 @@ void Domain::create_node( double coord )
   nodes.push_back( new Node( node_ID, coord ) );
 }
 
+/* Given a coordinate, node type, and BC, create a node and store in `nodes.' */
+void Domain::create_node( double coord, Node::node_type type, double bc )
+{
+  // Use current size of nodes as ID of new node;
+  std::size_t node_ID = nodes.size( );
+  nodes.push_back( new Node( node_ID, coord, type, bc ) );
+}
+
 /* -------------------------------------------------------------------------- */
 
 /* Given the node ids and a material id, create an element and store in
  * `elements.'
  * PRECONDITION:  Nodes `n0' and `n1' and material `mat_id' must be created */
-void Domain::create_elem( std::size_t n0, std::size_t n1, std::size_t mat_id )
+void Domain::create_element(
+    std::size_t n0,
+    std::size_t n1,
+    std::size_t mat_id
+    )
 {
   // Use current size of elements as ID of new element;
   std::size_t ele_ID = elements.size( );
@@ -72,8 +84,8 @@ void Domain::create_elem( std::size_t n0, std::size_t n1, std::size_t mat_id )
 /* -------------------------------------------------------------------------- */
 
 /* Builds the stiffness matrix by looping elements and assembling.
- * PRECONDITION:  `elements' must be instantiated. */
-void Domain::build_stiffness( )
+ * PRECONDITION:  `elements' must be properly initialized. */
+void Domain::build_stiffness( std::size_t int_order )
 {
   // Get number of equations;
   // TODO:  Generalize to problems with essential boundary conditions.
@@ -87,7 +99,7 @@ void Domain::build_stiffness( )
       elem_it != elements.end( ); ++elem_it ) {
     Element * elem = *elem_it;
 
-    Eigen::MatrixXd stiff_elem = elem->get_stiffness( );
+    Eigen::MatrixXd stiff_elem = elem->get_stiffness( int_order );
     for( std::size_t a{ 0 }; a != elem->NEN; ++a ) {
       for( std::size_t b{ 0 }; b != elem->NEN; ++b ) {
 
@@ -108,7 +120,7 @@ void Domain::build_stiffness( )
 /* -------------------------------------------------------------------------- */
 
 /* Builds the force vector by looping elements and assembling.
- * PRECONDITION:  `elements' must be instantiated. */
+ * PRECONDITION:  `elements' must be properly initialized. */
 void Domain::build_force( )
 {
   // Get number of equations;
@@ -136,6 +148,20 @@ void Domain::build_force( )
       }
     }
   }
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Builds the system of equations and then solves.
+ * PRECONDITION:  `elements' must be properly initialized. */
+Eigen::VectorXd Domain::solve( std::size_t int_order )
+{
+  // Build the stiffness and force vectors;
+  build_stiffness( int_order );
+  build_force( );
+
+  disp = stiff.inverse( ) * force;
+  return disp;
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */

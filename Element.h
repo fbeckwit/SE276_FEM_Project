@@ -79,6 +79,11 @@ public:
   /* Returns the internal force acting on the element due to strain energy. */
   Eigen::MatrixXd get_force_int( );
 
+  /* Given the local node number, return the node type. */
+  inline Node::node_type get_node_type( std::size_t a ) const {
+    return nodes[a]->get_type( );
+  }
+
   /* Given an output stream, print the node locations. */
   void print_nodes( std::ostream &out = std::cout );
 

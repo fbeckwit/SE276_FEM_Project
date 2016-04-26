@@ -50,6 +50,7 @@ public:
   inline double get_coord( ) { return coord; }
   inline double get_traction( ) { return ( type == NBC ) ? bound_cond : 0; }
   inline node_type get_type( ) { return type; }
+  inline std::size_t get_eqn_num( ) { return node_ID; }
 
 private:
 
