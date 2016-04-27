@@ -186,6 +186,29 @@ Eigen::VectorXd Domain::solve( std::size_t int_order )
   return disp;
 }
 
+/* -------------------------------------------------------------------------- */
+
+/* Given an output stream and the number of stress points to print for each
+ * element, compute the stress and print to the output. */
+void Domain::print_stress( std::ostream & out, std::size_t pts_per_ele ) const
+{
+  // Generate vector of output points;
+  std::vector<double> xi( pts_per_ele );
+  double cell_len = 2.0 / ( pts_per_ele - 1 );
+  for( std::size_t pt{ 0 }; pt != pts_per_ele; ++pt )
+    xi[pt] = -1 + pt * cell_len;
+
+  // Loop over the elements, grab their stress, and output;
+  for( const auto elem : elements ) {
+    // Loop points and output stress;
+    for( auto pt : xi ) {
+      Eigen::Vector3d stress = elem->get_stress( pt );
+      out << stress(0) << '\t' << stress(1) << '\t' << stress(2) << '\t' <<
+       1/3.0 * (stress(0) + stress(1) + stress(2)) << '\n';
+    }
+  }
+}
+
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
 
 /* Given a vector of displacements, update the nodes. */

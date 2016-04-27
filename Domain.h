@@ -76,6 +76,11 @@ public:
    * PRECONDITION:  `elements' must be properly initialized. */
   Eigen::VectorXd solve( std::size_t int_order = 2 );
 
+  /* Given an output stream and the number of stress points to print for each
+   * element, compute the stress and print to the output. */
+  void print_stress( std::ostream & out = std::cout,
+                     std::size_t pts_per_ele = 11 ) const;
+
 private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */

@@ -9,21 +9,12 @@
 #include <iostream>
 #include <cmath>
 
-void print_stiffness(
-    Element & e,
-    std::size_t int_order,
-    std::ostream &out = std::cout
-    )
-{
-  out << "Stiffness(" << int_order << "-pt) = [\n";
-  out << e.get_stiffness( int_order ) << "\n]\n";
-}
-
 double calc_exact( double r, double P, double E, double nu )
 {
   double a = 6.0;
   double b = 9.0;
-  return P * a*a * r / E / (b*b - a*a) * ((1 + nu)*(1 - 2*nu) + b*b/(r*r) * (1 + nu));
+  return P * a*a * r / E / (b*b - a*a) *
+    ((1 + nu)*(1 - 2*nu) + b*b/(r*r) * (1 + nu));
 }
 
 int main( int argc, char *argv[] )
@@ -35,8 +26,8 @@ int main( int argc, char *argv[] )
   double b = 9.0;
   double P = 10.0;
   double E = 1000.0;
-  double nu = 0.499999;
-  std::size_t num_elem = 100;
+  double nu = 0.25;
+  std::size_t num_elem = 20;
 
   // Load nodes;
   Domain domain;
@@ -56,7 +47,7 @@ int main( int argc, char *argv[] )
     domain.create_element( ele_i, ele_i + 1, 0 );
   }
 
-  Eigen::VectorXd disp = domain.solve( 2 );
+  Eigen::VectorXd disp = domain.solve( 1 );
 
   Eigen::VectorXd exact( num_elem + 1 );
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
@@ -69,6 +60,9 @@ int main( int argc, char *argv[] )
   std::cout << "disp = [\n" << disp << "\n]\n";
   std::cout << "exact = [\n" << exact << "\n]\n";
   std::cout << "error = [\n" << error << "\n]\n";
+
+  std::cout << '\n';
+  domain.print_stress( std::cout );
 
   return 0;
 }
