@@ -21,20 +21,13 @@
 /* Destructor */
 Domain::~Domain( )
 {
-  // Delete the nodes;
-  for( std::vector<Node *>::iterator it = nodes.begin( );
-      it != nodes.end( ); ++it )
-    delete *it;
-
-  // Delete the elements;
-  for( std::vector<Element *>::iterator it = elements.begin( );
-      it != elements.end( ); ++it )
-    delete *it;
-
-  // Delete the materials;
-  for( std::vector<Material *>::iterator it = materials.begin( );
-      it != materials.end( ); ++it )
-    delete *it;
+  // Delete the nodes, elements, and materials;
+  for( auto it : nodes )
+    delete it;
+  for( auto it : elements )
+    delete it;
+  for( auto it : materials )
+    delete it;
 }
 
 /* ***********************  PUBLIC MEMBER FUNCTIONS  ************************ */
