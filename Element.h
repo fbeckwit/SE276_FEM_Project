@@ -19,7 +19,6 @@
 #include "Node.h"
 
 // System headers;
-#include <array>
 #include <cstddef>
 #include <iostream>
 #include <Eigen/LU>
@@ -91,6 +90,16 @@ public:
    * element. */
   double interp_coord( double xi ) const;
 
+  /* Given the parametric coordinate, xi, interpolate the displacement within
+   * the element.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  double interp_disp( double xi ) const;
+
+  /* Given the parametric coordinate, xi, interpolate the stresses from the
+   * resulting displacement.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  Eigen::Vector3d interp_stress( double xi ) const;
+
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
   static double shape_func( double xi, std::size_t a );
@@ -110,11 +119,6 @@ public:
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B. */
   Eigen::Vector2d get_gradient_matrix( double xi, std::size_t a ) const;
-
-  /* Given the parametric coordinate, xi, return the stresses from the resulting
-   * displacement.
-   * PRECONDITION:  Nodes must have updated displacements. */
-  Eigen::Vector3d get_stress( double xi ) const;
 
   inline std::size_t get_id( ) const { return ele_ID; }
 

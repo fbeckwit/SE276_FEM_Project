@@ -116,6 +116,35 @@ double Element::interp_coord( double xi ) const
 
 /* -------------------------------------------------------------------------- */
 
+/* Given the parametric coordinate, xi, interpolate the displacement within the
+ * element. */
+double Element::interp_disp( double xi ) const
+{
+  // Sum N_a * d_a;
+  double disp{0};
+  for( int a{0}; a != NEN; ++a )
+    disp += shape_func( xi, a ) * nodes[a]->disp;
+  return disp;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the parametric coordinate, xi, return the stresses from the resulting
+ * displacement.
+ * PRECONDITION:  Nodes must have updated displacements. */
+Eigen::Vector3d Element::interp_stress( double xi ) const
+{
+  // Calculate the strain components and pass to the material to get the stress;
+  Eigen::Vector2d strain;
+  strain.setZero( );
+  for( std::size_t a{ 0 }; a != NEN; ++a )
+    strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
+
+  return material->get_stress( strain );
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function.  */
 double Element::shape_func( double xi, std::size_t a )
@@ -146,22 +175,6 @@ Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a ) const
   B_a[1] = N_a / radius;
 
   return B_a;
-}
-
-/* -------------------------------------------------------------------------- */
-
-/* Given the parametric coordinate, xi, return the stresses from the resulting
- * displacement.
- * PRECONDITION:  Nodes must have updated displacements. */
-Eigen::Vector3d Element::get_stress( double xi ) const
-{
-  // Calculate the strain components and pass to the material to get the stress;
-  Eigen::Vector2d strain;
-  strain.setZero( );
-  for( std::size_t a{ 0 }; a != NEN; ++a )
-    strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
-
-  return material->get_stress( strain );
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */

@@ -27,7 +27,7 @@ int main( int argc, char *argv[] )
   double P = 10.0;
   double E = 1000.0;
   double nu = 0.25;
-  std::size_t num_elem = 20;
+  std::size_t num_elem = 40;
 
   // Load nodes;
   Domain domain;

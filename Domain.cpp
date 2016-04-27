@@ -14,6 +14,7 @@
 #include "Domain.h"
 
 // System headers;
+#include <iomanip>
 
 /* *****************************  COPY CONTROL  ***************************** */
 
@@ -198,15 +199,26 @@ void Domain::print_stress( std::ostream & out, std::size_t pts_per_ele ) const
   for( std::size_t pt{ 0 }; pt != pts_per_ele; ++pt )
     xi[pt] = -1 + pt * cell_len;
 
-  // Loop over the elements, grab their stress, and output;
+  // Set output precision and format;
+  std::streamsize prec = out.precision( 6 );
+  out << std::scientific;
+
+  // Loop over the elements and plotting points, grab their stress, and output;
   for( const auto elem : elements ) {
-    // Loop points and output stress;
     for( auto pt : xi ) {
-      Eigen::Vector3d stress = elem->get_stress( pt );
-      out << stress(0) << '\t' << stress(1) << '\t' << stress(2) << '\t' <<
-       1/3.0 * (stress(0) + stress(1) + stress(2)) << '\n';
+      // Grab info on plot point of element;
+      Eigen::Vector3d stress = elem->interp_stress( pt );
+      double radius = elem->interp_coord( pt );
+
+      // Output the information;
+      out << std::setw( 14 ) << radius;
+      for( std::size_t i{ 0 }; i != 3; ++i )
+        out << std::setw( 14 ) << stress(i);
+      out << '\n';
     }
   }
+  // Reset precision and format;
+  out << std::fixed << std::setprecision( prec );
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
