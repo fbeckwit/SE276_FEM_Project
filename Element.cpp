@@ -26,10 +26,10 @@ const std::size_t Element::NEN;
 
 /* Returns the stiffness matrix for the given element using the current
  * consistent tangent. */
-Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
+Eigen::MatrixXd Element::get_stiffness( std::size_t int_order ) const
 {
   // Get elastic modulii tensor;
-  Eigen::Matrix<double, 2, 2> elastic_mod = material->get_tangent( );
+  Eigen::Matrix2d elastic_mod = material->get_tangent( );
 
   // Get Gauss points and weights, and the values of radius at the points;
   // TODO:  Make Gauss quadrature work on function objects and convert this to
@@ -43,6 +43,7 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 
   // Calculate the stiffness matrix;
   Eigen::MatrixXd stiffness( NEN, NEN );
+  stiffness.setZero( );
   for( std::size_t a{ 0 }; a != NEN; ++a ) {
     for( std::size_t b{ a }; b != NEN; ++b) {
 
@@ -61,7 +62,6 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
         stiffness( b, a ) = stiffness( a, b );
     }
   }
-
   return stiffness;
 }
 
@@ -69,9 +69,10 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 
 /* Returns the external force acting on the element from tractions and body
  * forces. */
-Eigen::MatrixXd Element::get_force_ext( )
+Eigen::MatrixXd Element::get_force_ext( ) const
 {
   Eigen::VectorXd force( 2 );
+  force.setZero( );
 
   // Check if node is on the natural boundary (Node::NBC) and calc the force;
   for( std::size_t a{ 0 }; a != NEN; ++a ) {
@@ -86,7 +87,7 @@ Eigen::MatrixXd Element::get_force_ext( )
 /* -------------------------------------------------------------------------- */
 
 /* Returns the internal force acting on the element due to strain energy. */
-Eigen::MatrixXd Element::get_force_int( )
+Eigen::MatrixXd Element::get_force_int( ) const
 {
   return Eigen::MatrixXd( );
 }
@@ -94,7 +95,7 @@ Eigen::MatrixXd Element::get_force_int( )
 /* -------------------------------------------------------------------------- */
 
 /* Given an output stream, print the node locations. */
-void Element::print_nodes( std::ostream &out )
+void Element::print_nodes( std::ostream &out ) const
 {
   for ( int a{ 0 }; a != NEN; ++a )
     out << nodes[ a ]->get_coord( ) << '\n';
@@ -104,7 +105,7 @@ void Element::print_nodes( std::ostream &out )
 
 /* Given the parametric coordinate, xi, interpolate the coordinate within the
  * element. */
-double Element::interp_coord( double xi )
+double Element::interp_coord( double xi ) const
 {
   // Sum N_a * x_a;
   double coord{0};
@@ -130,7 +131,7 @@ double Element::shape_func( double xi, std::size_t a )
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the gradient matrix, B. */
-Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a )
+Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a ) const
 {
   // Determine the appropriate value of xi_a;
   int xi_a = ( a == 0 ) ? -1 : 1;

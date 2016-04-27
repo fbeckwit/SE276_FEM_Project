@@ -20,7 +20,7 @@
 #include "Node.h"
 
 // System headers;
-#include <Eigen/LU>
+#include <Eigen/Cholesky>
 #include <iostream>
 #include <vector>
 
@@ -31,7 +31,7 @@ public:
   /* ****************************  COPY CONTROL  **************************** */
 
   /* Default constructor */
-  Domain( ) : nodes{ }, elements{ }, materials{ }, stiff{ }, force{ }, disp{ }
+  Domain( ) : nodes{ }, elements{ }, materials{ }, num_equations{ 0 }
   { }
 
   /* Domain should be unique, disallow copy and assignment operators */
@@ -61,13 +61,16 @@ public:
    * PRECONDITION:  Nodes `n0' and `n1' and material `mat_id' must be created */
   void create_element( std::size_t n0, std::size_t n1, std::size_t mat_id );
 
+  /* Count the number of equations corresponding to free DOFs and store. */
+  std::size_t get_eqn_count( );
+
   /* Builds the stiffness matrix by looping elements and assembling.
    * PRECONDITION:  `elements' must be properly initialized. */
-  void build_stiffness( std::size_t int_order = 2 );
+  Eigen::MatrixXd build_stiffness( std::size_t int_order = 2 );
 
   /* Builds the force vector by looping elements and assembling.
    * PRECONDITION:  `elements' must be properly initialized. */
-  void build_force( );
+  Eigen::VectorXd build_force( );
 
   /* Builds the system of equations and then solves.
    * PRECONDITION:  `elements' must be properly initialized. */
@@ -81,13 +84,12 @@ private:
   std::vector<Node *> nodes;
   std::vector<Element *> elements;
   std::vector<Material *> materials;
-
-  /* Matrix elements and solvers */
-  Eigen::MatrixXd stiff;
-  Eigen::VectorXd force;
-  Eigen::VectorXd disp;
+  std::size_t num_equations;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
+
+  /* Given a vector of displacements, update the nodes. */
+  void update_nodes( const Eigen::VectorXd & displacement );
 
 };
 

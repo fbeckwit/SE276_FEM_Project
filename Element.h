@@ -70,14 +70,14 @@ public:
 
   /* Returns the stiffness matrix for the given element using the current
    * consistent tangent. */
-  Eigen::MatrixXd get_stiffness( std::size_t int_order = 2 );
+  Eigen::MatrixXd get_stiffness( std::size_t int_order = 2 ) const;
 
   /* Returns the external force acting on the element from tractions and body
    * forces. */
-  Eigen::MatrixXd get_force_ext( );
+  Eigen::MatrixXd get_force_ext( ) const;
 
   /* Returns the internal force acting on the element due to strain energy. */
-  Eigen::MatrixXd get_force_int( );
+  Eigen::MatrixXd get_force_int( ) const;
 
   /* Given the local node number, return the node type. */
   inline Node::node_type get_node_type( std::size_t a ) const {
@@ -85,11 +85,11 @@ public:
   }
 
   /* Given an output stream, print the node locations. */
-  void print_nodes( std::ostream &out = std::cout );
+  void print_nodes( std::ostream &out = std::cout ) const;
 
   /* Given the parametric coordinate, xi, interpolate the coordinate within the
    * element. */
-  double interp_coord( double xi );
+  double interp_coord( double xi ) const;
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
@@ -109,7 +109,14 @@ public:
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B. */
-  Eigen::Vector2d get_gradient_matrix( double xi, std::size_t a );
+  Eigen::Vector2d get_gradient_matrix( double xi, std::size_t a ) const;
+
+  /* Given the parametric coordinate, xi, return the stresses from the resulting
+   * displacement.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  Eigen::Vector3d get_stress( double xi ) const;
+
+  inline std::size_t get_id( ) const { return ele_ID; }
 
 private:
 

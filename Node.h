@@ -51,6 +51,7 @@ public:
   inline double get_traction( ) { return ( type == NBC ) ? bound_cond : 0; }
   inline node_type get_type( ) { return type; }
   inline std::size_t get_eqn_num( ) { return node_ID; }
+  inline void update_disp( double d ) { disp = d; }
 
 private:
 

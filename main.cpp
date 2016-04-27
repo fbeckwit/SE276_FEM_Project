@@ -5,7 +5,7 @@
 #include "Material.h"
 #include "Node.h"
 
-#include <Eigen/LU>
+#include <Eigen/Dense>
 #include <iostream>
 #include <cmath>
 
@@ -35,11 +35,11 @@ int main( int argc, char *argv[] )
   double b = 9.0;
   double P = 10.0;
   double E = 1000.0;
-  double nu = 0.499;
+  double nu = 0.499999;
+  std::size_t num_elem = 100;
 
   // Load nodes;
   Domain domain;
-  std::size_t num_elem = 80;
   double elem_size = ( b - a ) / num_elem;
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
     double coord = a + node_i * elem_size;
@@ -56,7 +56,7 @@ int main( int argc, char *argv[] )
     domain.create_element( ele_i, ele_i + 1, 0 );
   }
 
-  Eigen::VectorXd disp = domain.solve( );
+  Eigen::VectorXd disp = domain.solve( 2 );
 
   Eigen::VectorXd exact( num_elem + 1 );
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {

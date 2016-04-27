@@ -83,16 +83,29 @@ void Domain::create_element(
 
 /* -------------------------------------------------------------------------- */
 
+/* Count the number of equations corresponding to free DOFs and store. */
+std::size_t Domain::get_eqn_count( )
+{
+  // Reset the DOF counter;
+  num_equations = 0;
+
+  // Loop over node DOFs and count those not on the EBC;
+  for( auto node : nodes ) {
+    if( node->get_type( ) != Node::EBC )
+      ++num_equations;
+  }
+  return num_equations;
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* Builds the stiffness matrix by looping elements and assembling.
  * PRECONDITION:  `elements' must be properly initialized. */
-void Domain::build_stiffness( std::size_t int_order )
+Eigen::MatrixXd Domain::build_stiffness( std::size_t int_order )
 {
-  // Get number of equations;
-  // TODO:  Generalize to problems with essential boundary conditions.
-  std::size_t NEQ = nodes.size( );
-
   // Resize the stiffness matrix;
-  stiff.resize( NEQ, NEQ );
+  Eigen::MatrixXd stiff( num_equations, num_equations );
+  stiff.setZero( );
 
   // Loop over elements, get each stiffness and assemble to global stiffness;
   for( std::vector<Element *>::const_iterator elem_it = elements.begin( );
@@ -115,21 +128,19 @@ void Domain::build_stiffness( std::size_t int_order )
       }
     }
   }
+  return stiff;
 }
 
 /* -------------------------------------------------------------------------- */
 
 /* Builds the force vector by looping elements and assembling.
- * PRECONDITION:  `elements' must be properly initialized. */
-void Domain::build_force( )
+ * PRECONDITION:  `elements' must be properly initialized and num_equations must
+ * be valid. */
+Eigen::VectorXd Domain::build_force( )
 {
-  // Get number of equations;
-  // TODO:  Generalize to problems with essential boundary conditions.  Also
-  // make a private function (needed in the above as well).
-  std::size_t NEQ = nodes.size( );
-
   // Resize the force vector;
-  force.resize( NEQ );
+  Eigen::VectorXd force( num_equations );
+  force.setZero( );
 
   // Loop over the elements, get each external force and assemble to global;
   for( std::vector<Element *>::const_iterator elem_it = elements.begin( );
@@ -148,20 +159,48 @@ void Domain::build_force( )
       }
     }
   }
+  return force;
 }
 
 /* -------------------------------------------------------------------------- */
 
-/* Builds the system of equations and then solves.
+/* Given the integration order, builds the system of equations, solves, and
+ * returns displacement.
  * PRECONDITION:  `elements' must be properly initialized. */
 Eigen::VectorXd Domain::solve( std::size_t int_order )
 {
-  // Build the stiffness and force vectors;
-  build_stiffness( int_order );
-  build_force( );
+  // Get the number of equations of the system;
+  get_eqn_count( );
 
-  disp = stiff.inverse( ) * force;
+  // Build the stiffness and force vectors;
+  Eigen::MatrixXd stiff = build_stiffness( int_order );
+  Eigen::VectorXd force = build_force( );
+
+  // Solve system;
+  Eigen::VectorXd disp( num_equations );
+  disp.setZero( );
+  disp = stiff.llt( ).solve( force );
+
+  // Update the nodes;
+  update_nodes( disp );
   return disp;
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
+
+/* Given a vector of displacements, update the nodes. */
+void Domain::update_nodes( const Eigen::VectorXd & displacement )
+{
+  // Loop over the nodes and update any necessary information;
+  for( std::vector<Node *>::iterator node_iter = nodes.begin( );
+      node_iter != nodes.end( ); ++node_iter ) {
+    Node *node = *node_iter;
+
+    // Check if the node is a DOF of the system;
+    if( node->get_type( ) != Node::EBC ) {
+      // Grab the global equation number and update the dipslacement;
+      std::size_t A = node->get_eqn_num( );
+      node->update_disp( displacement[A] );
+    }
+  }
+}
