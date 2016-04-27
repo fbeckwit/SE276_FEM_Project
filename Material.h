@@ -44,6 +44,9 @@ public:
   /* Return the tangent elastic modulii tensor for the material. */
   Eigen::Matrix2d get_tangent( ) const;
 
+  /* Given the strain, return the resulting stress. */
+  Eigen::Vector3d get_stress( const Eigen::Vector2d & strain ) const;
+
 private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */

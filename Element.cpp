@@ -148,4 +148,20 @@ Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a ) const
   return B_a;
 }
 
+/* -------------------------------------------------------------------------- */
+
+/* Given the parametric coordinate, xi, return the stresses from the resulting
+ * displacement.
+ * PRECONDITION:  Nodes must have updated displacements. */
+Eigen::Vector3d Element::get_stress( double xi ) const
+{
+  // Calculate the strain components and pass to the material to get the stress;
+  Eigen::Vector2d strain;
+  strain.setZero( );
+  for( std::size_t a{ 0 }; a != NEN; ++a )
+    strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
+
+  return material->get_stress( strain );
+}
+
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
