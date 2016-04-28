@@ -116,6 +116,22 @@ double Element::interp_coord( double xi ) const
 
 /* -------------------------------------------------------------------------- */
 
+/* Given the number of points to print, interpolate the coordinates within the
+ * element. */
+std::vector<double> Element::interp_coord( std::size_t num_pts) const
+{
+  // Get the points over the parametric domain;
+  std::vector<double> xi = get_points( num_pts );
+
+  // Loop the points, interpolate the displacement, and return;
+  std::vector<double> coord( num_pts );
+  for( std::size_t i{ 0 }; i != num_pts; ++i )
+    coord[i] = interp_coord( xi[i] );
+  return coord;
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* Given the parametric coordinate, xi, interpolate the displacement within the
  * element. */
 double Element::interp_disp( double xi ) const
@@ -124,6 +140,23 @@ double Element::interp_disp( double xi ) const
   double disp{0};
   for( int a{0}; a != NEN; ++a )
     disp += shape_func( xi, a ) * nodes[a]->disp;
+  return disp;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the number of points to print, interpolate the displacements within the
+ * element.
+ * PRECONDITION:  Nodes must have updated displacements. */
+std::vector<double> Element::interp_disp( std::size_t num_pts) const
+{
+  // Get the points over the parametric domain;
+  std::vector<double> xi = get_points( num_pts );
+
+  // Loop the points, interpolate the displacement, and return;
+  std::vector<double> disp( num_pts );
+  for( std::size_t i{ 0 }; i != num_pts; ++i )
+    disp[i] = interp_disp( xi[i] );
   return disp;
 }
 
@@ -141,6 +174,23 @@ Eigen::Vector3d Element::interp_stress( double xi ) const
     strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
 
   return material->get_stress( strain );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the number of points to print, interpolate the stresses from the
+ * resulting displacement.
+ * PRECONDITION:  Nodes must have updated displacements. */
+std::vector<Eigen::Vector3d> Element::interp_stress( std::size_t num_pts) const
+{
+  // Get the points over the parametric domain;
+  std::vector<double> xi = get_points( num_pts );
+
+  // Loop the points, interpolate the displacement, and return;
+  std::vector<Eigen::Vector3d> stress( num_pts );
+  for( std::size_t i{ 0 }; i != num_pts; ++i )
+    stress[i] = interp_stress( xi[i] );
+  return stress;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -178,3 +228,17 @@ Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a ) const
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
+
+/* Given the number of intervals, return a set of equally spaced points over the
+ * parametric domain. */
+std::vector<double> Element::get_points( std::size_t num_pts )
+{
+  // Get interval size;
+  double cell_size = 2.0 / ( num_pts - 1 );
+
+  // Create vector of points in parametric domain and return;
+  std::vector<double> xi( num_pts );
+  for( std::vector<double>::size_type i{ 0 }; i != num_pts; ++i )
+    xi[i] = -1.0 + i * cell_size;
+  return xi;
+}

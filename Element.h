@@ -90,15 +90,29 @@ public:
    * element. */
   double interp_coord( double xi ) const;
 
+  /* Given the number of points to print, interpolate the coordinates within the
+   * element. */
+  std::vector<double> interp_coord( std::size_t num_pts = 11 ) const;
+
   /* Given the parametric coordinate, xi, interpolate the displacement within
    * the element.
    * PRECONDITION:  Nodes must have updated displacements. */
   double interp_disp( double xi ) const;
 
+  /* Given the number of points to print, interpolate the displacements within
+   * the element.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  std::vector<double> interp_disp( std::size_t num_pts = 11 ) const;
+
   /* Given the parametric coordinate, xi, interpolate the stresses from the
    * resulting displacement.
    * PRECONDITION:  Nodes must have updated displacements. */
   Eigen::Vector3d interp_stress( double xi ) const;
+
+  /* Given the number of points to print, interpolate the stresses from the
+   * resulting displacement.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  std::vector<Eigen::Vector3d> interp_stress( std::size_t num_pts = 11 ) const;
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
@@ -132,6 +146,10 @@ private:
   std::size_t ele_ID;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
+
+  /* Given the number of intervals, return a set of equally spaced points over
+   * the parametric domain. */
+  static std::vector<double> get_points( std::size_t num_pts = 11 );
 
 };
 

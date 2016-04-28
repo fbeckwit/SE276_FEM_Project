@@ -49,6 +49,8 @@ void Domain::create_node( double coord )
   nodes.push_back( new Node( node_ID, coord ) );
 }
 
+/* -------------------------------------------------------------------------- */
+
 /* Given a coordinate, node type, and BC, create a node and store in `nodes.' */
 void Domain::create_node( double coord, Node::node_type type, double bc )
 {
@@ -182,31 +184,53 @@ Eigen::VectorXd Domain::solve( std::size_t int_order )
 
 /* -------------------------------------------------------------------------- */
 
-/* Given an output stream and the number of stress points to print for each
- * element, compute the stress and print to the output. */
-void Domain::print_stress( std::ostream & out, std::size_t pts_per_ele ) const
+/* Given an output stream and the number of displacement points to print for
+ * each element, compute the displacement and print to the output. */
+void Domain::print_disp( std::ostream & out, std::size_t num_pts ) const
 {
-  // Generate vector of output points;
-  std::vector<double> xi( pts_per_ele );
-  double cell_len = 2.0 / ( pts_per_ele - 1 );
-  for( std::size_t pt{ 0 }; pt != pts_per_ele; ++pt )
-    xi[pt] = -1 + pt * cell_len;
-
   // Set output precision and format;
   std::streamsize prec = out.precision( 6 );
+  std::streamsize width = 14;
+  out << std::scientific;
+
+  // Loop over the elements and plotting points, grab their disp, and output;
+  for( const auto elem : elements ) {
+    // Get the radius and displacements over the element;
+    std::vector<double> radius = elem->interp_coord( num_pts );
+    std::vector<double> disp = elem->interp_disp( num_pts );
+
+    for( std::vector<double>::size_type i{ 0 }; i != disp.size( ); ++i ) {
+      // Output the information;
+      out << std::setw( width ) << radius[i];
+      out << std::setw( width ) << disp[i];
+      out << '\n';
+    }
+  }
+  // Reset precision and format;
+  out << std::fixed << std::setprecision( prec );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given an output stream and the number of stress points to print for each
+ * element, compute the stress and print to the output. */
+void Domain::print_stress( std::ostream & out, std::size_t num_pts ) const
+{
+  // Set output precision and format;
+  std::streamsize prec = out.precision( 6 );
+  std::streamsize width = 14;
   out << std::scientific;
 
   // Loop over the elements and plotting points, grab their stress, and output;
   for( const auto elem : elements ) {
-    for( auto pt : xi ) {
-      // Grab info on plot point of element;
-      Eigen::Vector3d stress = elem->interp_stress( pt );
-      double radius = elem->interp_coord( pt );
+    std::vector<double> radius = elem->interp_coord( num_pts );
+    std::vector<Eigen::Vector3d> stress = elem->interp_stress( num_pts );
 
+    for( std::vector<double>::size_type i{ 0 }; i != radius.size( ); ++i ) {
       // Output the information;
-      out << std::setw( 14 ) << radius;
-      for( std::size_t i{ 0 }; i != 3; ++i )
-        out << std::setw( 14 ) << stress(i);
+      out << std::setw( width ) << radius[i];
+      for( std::size_t j{ 0 }; j != 3; ++j )
+        out << std::setw( width ) << stress[i][j];
       out << '\n';
     }
   }

@@ -26,8 +26,8 @@ int main( int argc, char *argv[] )
   double b = 9.0;
   double P = 10.0;
   double E = 1000.0;
-  double nu = 0.25;
-  std::size_t num_elem = 40;
+  double nu = 0.4999;
+  std::size_t num_elem = 10;
 
   // Load nodes;
   Domain domain;
@@ -62,6 +62,7 @@ int main( int argc, char *argv[] )
   std::cout << "error = [\n" << error << "\n]\n";
 
   std::cout << '\n';
+  domain.print_disp( std::cout );
   domain.print_stress( std::cout );
 
   return 0;
