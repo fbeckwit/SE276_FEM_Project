@@ -1,6 +1,3 @@
-Implement the element stiffness routine by using a functor instead of
-calculating Gauss integration points on the outside.
-
 Make the integration order a member variable passed to the element via the
 constructor.
   -> Will be necessary for materials that carry state information.  Each

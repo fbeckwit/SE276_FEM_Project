@@ -34,24 +34,28 @@ public:
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
   Element( ) :
-    nodes{ nullptr, nullptr }, material{ nullptr }, length{0.0}, ele_ID{ 0 }
+    nodes{ nullptr, nullptr }, stiff_eval( this ), material{ nullptr },
+    length{0.0}, ele_ID{ 0 }
   { }
 
   Element( std::size_t id, Node *n0, Node *n1, const Material *mat ) :
-    nodes{ n0, n1 }, material{ mat->clone( ) }, length{ 0.0 }, ele_ID{ id }
+    nodes{ n0, n1 }, stiff_eval( this ),  material{ mat->clone( ) },
+    length{ 0.0 }, ele_ID{ id }
   {
     length = n1->get_coord( ) - n0->get_coord( );
   }
 
   /* Copy Constructor */
   Element( const Element & other ) :
-    nodes{ other.nodes }, material{ other.material->clone( ) },
+    nodes{ other.nodes }, stiff_eval( this ),
+    material{ other.material->clone( ) },
     length{ other.length }, ele_ID{ other.ele_ID }
   { }
 
   /* Move Constructor */
   Element( Element && other ) :
-    nodes{ std::move( other.nodes ) }, material{ other.material },
+    nodes{ std::move( other.nodes ) }, stiff_eval( this ),
+    material{ other.material },
     length{ other.length }, ele_ID{ other.ele_ID }
   {
     other.nodes = { nullptr, nullptr };
@@ -70,7 +74,7 @@ public:
 
   /* Returns the stiffness matrix for the given element using the current
    * consistent tangent. */
-  Eigen::MatrixXd get_stiffness( std::size_t int_order = 2 ) const;
+  Eigen::MatrixXd get_stiffness( std::size_t int_order = 2 );
 
   /* Returns the external force acting on the element from tractions and body
    * forces. */
@@ -202,9 +206,38 @@ public:
 
 private:
 
+  /* ***************************  NESTED CLASSES  *************************** */
+
+  /* Function object used in the evaluation of the stiffness matrix.  operator()
+   * overloaded to return the internal energy density at the evaluation point,
+   * xi. */
+  struct Stiff_Eval {
+
+    /* Constructor */
+    Stiff_Eval( const Element * p, std::size_t _a = 0, std::size_t _b = 0 ) :
+      parent{ p }, a{ _a }, b{ _b }
+    { }
+
+    /* Set the indeces as given.  Called before using integrate so that the
+     * correct submatrix k_{ab} is calculated. */
+    inline void set_indeces( std::size_t _a, std::size_t _b ) {
+      a = _a;
+      b = _b;
+    }
+
+    /* Given a parametric coordinate, xi, calculate the internal energy density
+     * of the stiffness. */
+    double operator()( double xi ) const;
+
+    const Element * parent;
+    std::size_t a;
+    std::size_t b;
+  };
+
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
   std::vector<Node *> nodes;
+  Stiff_Eval stiff_eval;
   Material *material;
   double length;
   std::size_t ele_ID;

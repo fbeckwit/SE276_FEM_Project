@@ -26,36 +26,15 @@ const std::size_t Element::NEN;
 
 /* Returns the stiffness matrix for the given element using the current
  * consistent tangent. */
-Eigen::MatrixXd Element::get_stiffness( std::size_t int_order ) const
+Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 {
-  // Get elastic modulii tensor;
-  Eigen::Matrix2d elastic_mod = material->get_tangent( );
-
-  // Get Gauss points and weights, and the values of radius at the points;
-  // TODO:  Make Gauss quadrature work on function objects and convert this to
-  // utilize that (would remove need to grab Gauss points & weights and others);
-  std::vector<double> gauss_pts = util::get_gauss_pts( int_order );
-  std::vector<double> gauss_wts = util::get_gauss_wts( int_order );
-  std::vector<double> func_eval( int_order );
-  std::vector<double> radius( int_order );
-  for( std::size_t pt{ 0 }; pt != int_order; ++pt )
-    radius[pt] = interp_coord( gauss_pts[pt] );
-
   // Calculate the stiffness matrix;
-  Eigen::MatrixXd stiffness( NEN, NEN );
-  stiffness.setZero( );
+  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( NEN, NEN );
   for( std::size_t a{ 0 }; a != NEN; ++a ) {
     for( std::size_t b{ a }; b != NEN; ++b) {
 
-      // Calculate k_{ab}.  Get function evaluations;
-      for( std::size_t pt{ 0 }; pt != int_order; ++pt) {
-        Eigen::Vector2d B_a = get_gradient_matrix( gauss_pts[pt], a );
-        Eigen::Vector2d B_b = get_gradient_matrix( gauss_pts[pt], b );
-
-        func_eval[pt] = ( B_a.transpose( ) * elastic_mod * B_b ).value( );
-        func_eval[pt] *= radius[pt] * length / 2.0;
-      }
-      stiffness( a, b ) = util::integrate( func_eval, gauss_wts );
+      stiff_eval.set_indeces( a, b );
+      stiffness( a, b ) = util::integrate( stiff_eval, int_order );
 
       // If we're calculating off-diagonal terms, copy to the lower triangle;
       if ( a != b )
@@ -241,4 +220,17 @@ std::vector<double> Element::get_points( std::size_t num_pts )
   for( std::vector<double>::size_type i{ 0 }; i != num_pts; ++i )
     xi[i] = -1.0 + i * cell_size;
   return xi;
+}
+
+double Element::Stiff_Eval::operator()( double xi ) const
+{
+  // Get required matrices and info;
+  Eigen::Matrix2d elastic_mod = parent->material->get_tangent( );
+  double radius = parent->interp_coord( xi );
+  Eigen::Vector2d B_a = parent->get_gradient_matrix( xi, a );
+  Eigen::Vector2d B_b = parent->get_gradient_matrix( xi, b );
+
+  // Calculate value;
+  double ret = ( B_a.transpose( ) * elastic_mod * B_b ).value( );
+  return ret * radius * parent->length / 2.0;
 }

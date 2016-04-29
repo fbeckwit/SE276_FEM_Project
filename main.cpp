@@ -41,7 +41,7 @@ int main( int argc, char *argv[] )
   }
 
   // Check optional arguments, require user to provide two output file names;
-  if( argc < 5 ) {
+  if( argc > 3 && argc < 5 ) {
     std::cerr << "Error:  Please give second output file.\n";
     std::cerr << usage;
     return -1;
@@ -90,7 +90,7 @@ int main( int argc, char *argv[] )
 
   // Solve system of equations;
   std::cout << "\nSolving system of equations:\n";
-  Eigen::VectorXd disp = domain.solve( 2 );
+  Eigen::VectorXd disp = domain.solve( );
 
   // Output results with comparison to anayltical;
   Exact_Disp disp_func{ E, nu, P, a, b };
