@@ -98,7 +98,7 @@ public:
 
     // Print header;
     out << '#' << std::string( width - 1, ' ' );
-    print_centered( std::string( "Radial Displacement" ), width * 3, out);
+    print_centered( std::string( "Radial Displacement" ), width * 3, out, true);
     out << "\n#" << std::setw( width - 1 ) << "Radius:";
     out << std::setw( width ) << "FEM:" << std::setw( width ) << "Exact:" <<
       std::setw( width ) << "Error:";
@@ -134,7 +134,7 @@ public:
     out << '#' << std::string( width - 1, ' ' );
     print_centered( std::string( "Radial Stress" ), width * 3, out);
     print_centered( std::string( "Hoop Stress" ), width * 3, out);
-    print_centered( std::string( "Axial Stress" ), width * 3, out);
+    print_centered( std::string( "Axial Stress" ), width * 3, out, true);
     out << "\n#" << std::setw( width - 1 ) << "Radius:";
     for( std::size_t j{ 0 }; j != 3; ++j )
       out << std::setw( width ) << "FEM:" << std::setw( width ) << "Exact:" <<
@@ -167,7 +167,7 @@ private:
   /* Given a string, a field width, and an output stream, center the string and
    * print to the output. */
   void print_centered( const std::string & str,
-      std::size_t width, std::ostream & out ) const;
+      std::size_t width, std::ostream & out, bool trim = false ) const;
 
 };
 
