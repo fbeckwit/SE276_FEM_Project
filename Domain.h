@@ -21,7 +21,9 @@
 
 // System headers;
 #include <Eigen/Cholesky>
+#include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 
 class Domain {
@@ -79,12 +81,107 @@ public:
   /* Given an output stream and the number of displacement points to print for
    * each element, compute the displacement and print to the output. */
   void print_disp( std::ostream & out = std::cout,
-                     std::size_t pts_per_ele = 11 ) const;
+                     std::size_t num_pts = 11 ) const;
+
+  /* Given a function object to calculate the exact displacement, an output
+   * stream,  and the number of displacement points to print for each element,
+   * compute the displacement and print to the output. */
+  template <typename Func>
+  void print_disp( const Func & exact,
+      std::ostream & out = std::cout,
+      std::size_t num_pts = 11 ) const
+  {
+    // Set output precision and format;
+    std::streamsize prec = out.precision( 6 );
+    std::streamsize width = 14;
+    out << std::scientific;
+
+    // Loop over the elements and plotting points, grab their disp, and output;
+    for( const auto elem : elements ) {
+      // Get the radius and displacements over the element;
+      std::vector<double> radius = elem->interp_coord( num_pts );
+      std::vector<double> disp = elem->interp_disp( num_pts );
+
+      // Get the exact solution and the error from the function object;
+      std::vector<double> disp_exact( num_pts );
+      std::vector<double> disp_error( num_pts );
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        disp_exact[i] = exact( radius[i] );
+        disp_error[i] = disp_exact[i] - disp[i];
+      }
+
+      // Output the information;
+      for( std::vector<double>::size_type i{ 0 }; i != disp.size( ); ++i ) {
+        out << std::setw( width ) << radius[i];
+        out << std::setw( width ) << disp[i];
+        out << std::setw( width ) << disp_exact[i];
+        out << std::setw( width ) << disp_error[i];
+        out << '\n';
+      }
+    }
+    // Reset precision and format;
+    out << std::fixed << std::setprecision( prec );
+  }
 
   /* Given an output stream and the number of stress points to print for each
    * element, compute the stress and print to the output. */
   void print_stress( std::ostream & out = std::cout,
-                     std::size_t pts_per_ele = 11 ) const;
+                     std::size_t num_pts = 11 ) const;
+
+  /* Given a function object to calculate the exact stresses, an output stream,
+   * and the number of stress points to print for each element, compute the
+   * stress and print to the output. */
+  template <typename Func>
+  void print_stress( const Func & exact,
+      std::ostream & out = std::cout,
+      std::size_t num_pts = 11 ) const
+  {
+    // Set output precision and format;
+    std::streamsize prec = out.precision( 6 );
+    std::size_t width = 14;
+    out << std::scientific;
+
+    // Print header;
+    out << '#' << std::string( width - 1, ' ' );
+    print_centered( std::string( "Radial Stress" ), width * 3, out);
+    print_centered( std::string( "Hoop Stress" ), width * 3, out);
+    print_centered( std::string( "Axial Stress" ), width * 3, out);
+    out << "\n#" << std::setw( width - 1 ) << "Radius:";
+    for( std::size_t j{ 0 }; j != 3; ++j )
+      out << std::setw( width ) << "FEM:" << std::setw( width ) << "Exact:" <<
+        std::setw( width ) << "Error:";
+    out << '\n';
+
+    // Loop over the elements and plotting points, grab their disp, and output;
+    for( const auto elem : elements ) {
+      // Get the radius and displacements over the element;
+      std::vector<double> radius = elem->interp_coord( num_pts );
+      std::vector<Eigen::Vector3d> stress = elem->interp_stress( num_pts );
+
+      // Get the exact solution and the error from the function object;
+      std::vector<Eigen::Vector3d>
+        stress_exact( num_pts, Eigen::Vector3d::Zero( ) );
+      std::vector<Eigen::Vector3d>
+        stress_error( num_pts, Eigen::Vector3d::Zero( ) );
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        stress_exact[i] = exact( radius[i] );
+        stress_error[i] = stress_exact[i] - stress[i];
+      }
+
+      // Output the information;
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        out << std::setw( width ) << radius[i];
+        for( std::size_t j{ 0 }; j != 3; ++j ) {
+          out << std::setw( width ) << stress[i][j];
+          out << std::setw( width ) << stress_exact[i][j];
+          out << std::setw( width ) << stress_error[i][j];
+        }
+        out << '\n';
+      }
+    }
+    // Reset precision and format;
+    out << std::fixed << std::setprecision( prec );
+  }
 
 private:
 
@@ -100,6 +197,16 @@ private:
 
   /* Given a vector of displacements, update the nodes. */
   void update_nodes( const Eigen::VectorXd & displacement );
+
+  void print_centered( const std::string & str, std::size_t width, std::ostream & out ) const
+  {
+    // Create the header string;
+    int num_blanks = ( width - str.size( ) ) / 2;
+    std::string header = std::string( num_blanks, ' ' ) + str + std::string( num_blanks, ' ' );
+    if( header.size( ) < width )
+      header += ' ';
+    out << header;
+  }
 
 };
 
