@@ -1,71 +1,73 @@
+/* ************************************************************************** *
+ *                           Frank Nathan Beckwith                            *
+ *                                                                            *
+ *                                                                            *
+ *                                                                            *
+ * ************************************************************************** *
+ *                                                                            *
+ * Source file for the implementation of the Domain abstraction.              *
+ * Class definition given in Domain.h.                                        *
+ *                                                                            *
+ * ************************************************************************** */
 
+// Project-specific headers;
 #include "Domain.h"
 #include "Element.h"
+#include "exact.h"
 #include "gauss_quadrature.h"
 #include "Material.h"
 #include "Node.h"
 
-#include <Eigen/Dense>
-#include <iostream>
+// System headers;
 #include <cmath>
+#include <cstdlib>
+#include <Eigen/Dense>
+#include <fstream>
+#include <iostream>
 
-double calc_exact( double r, double P, double E, double nu )
-{
-  double a = 6.0;
-  double b = 9.0;
-  return P * a*a * r / E / (b*b - a*a) *
-    ((1 + nu)*(1 - 2*nu) + b*b/(r*r) * (1 + nu));
-}
-
-struct Exact_Disp {
-  Exact_Disp( double E, double nu, double P, double a, double b ) :
-    E{ E }, nu{ nu }, P{ P }, a{ a }, b{ b }
-  { }
-
-  double operator()( double r ) const {
-    return P * a*a * r / E / (b*b - a*a) *
-      ((1 + nu)*(1 - 2*nu) + b*b/(r*r) * (1 + nu));
-  }
-
-  double E;
-  double nu;
-  double P;
-  double a;
-  double b;
-};
-
-struct Exact_Stress {
-  Exact_Stress( double nu, double P, double a, double b ) :
-    nu{ nu }, P{ P }, a{ a }, b{ b }
-  { }
-
-  Eigen::Vector3d operator()( double r ) const {
-    Eigen::Vector3d ret = Eigen::Vector3d::Zero();
-    ret[0] = P * a*a / (b*b - a*a) * ( 1 - b*b / (r*r) );
-    ret[1] = P * a*a / (b*b - a*a) * ( 1 + b*b / (r*r) );
-    ret[2] = 2 * nu * P * a*a / (b*b - a*a);
-    return ret;
-  }
-
-  double nu;
-  double P;
-  double a;
-  double b;
-};
-
+/* ****************************  BEGIN PROGRAM  ***************************** */
 int main( int argc, char *argv[] )
 {
+  // Make usage string;
+  std::string usage( "Usage: ");
+  usage += argv[0];
+  usage += " poisson_ratio num_elements [disp_outfile stress_outfile]\n";
 
-  // Create some nodes;
+  // Check for appropriate number of inputs;
+  if( argc < 3 ) {
+    std::cerr << "ERROR:  Incorrect number of inputs.\n";
+    std::cerr << usage;
+    return -1;
+  }
+
+  // Check optional arguments, require user to provide two output file names;
+  if( argc < 5 ) {
+    std::cerr << "Error:  Please give second output file.\n";
+    std::cerr << usage;
+    return -1;
+  }
+
+  // Grab inputs;
+  double nu = std::atof( argv[1] );
+  std::size_t num_elem = atoi( argv[2] );
+
   // Problem inputs (hard-coded for now);
   double a = 6.0;
   double b = 9.0;
   double P = 10.0;
   double E = 1000.0;
-  double nu = 0.25;
-  std::size_t num_elem = 10;
 
-  // Load nodes;
+  // Print message;
+  std::cout << "Problem Inputs:\n";
+  std::cout << "    a = " << a << " in\n";
+  std::cout << "    b = " << b << " in\n";
+  std::cout << "    P = " << P << " psi\n";
+  std::cout << "    E = " << E << " psi\n";
+  std::cout << "    nu = " << nu << "\n";
+  std::cout << "    No. Elements = " << num_elem << "\n";
+
+  // Create domain nodes;
+  std::cout << "\nCreating domain:\n    Nodes ...\n";
   Domain domain;
   double elem_size = ( b - a ) / num_elem;
   for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
@@ -77,26 +79,40 @@ int main( int argc, char *argv[] )
   }
 
   // Create material;
+  std::cout << "    Materials ...\n";
   domain.create_material( E, nu );
 
+  // Create elements;
+  std::cout << "    Elements ...\n";
   for( std::size_t ele_i{ 0 }; ele_i != num_elem; ++ele_i ) {
     domain.create_element( ele_i, ele_i + 1, 0 );
   }
 
+  // Solve system of equations;
+  std::cout << "\nSolving system of equations:\n";
   Eigen::VectorXd disp = domain.solve( 2 );
 
-  Eigen::VectorXd exact( num_elem + 1 );
-  for( std::size_t node_i{ 0 }; node_i != num_elem + 1; ++node_i ) {
-    double coord = a + node_i * elem_size;
-    exact( node_i ) = calc_exact( coord, P, E, nu );
-  }
-
-
+  // Output results with comparison to anayltical;
   Exact_Disp disp_func{ E, nu, P, a, b };
   Exact_Stress stress_func{ nu, P, a, b };
-  std::cout << '\n';
-  domain.print_disp( disp_func );
-  domain.print_stress( stress_func );
+
+  // If optional arguments given, print to files.  Else, print to console.
+  if( argc > 3 ) {
+    std::ofstream out_disp( argv[3] );
+    std::ofstream out_stress( argv[4] );
+
+    domain.print_disp( disp_func, out_disp);
+    domain.print_stress( stress_func, out_stress );
+
+    out_disp.close( );
+    out_stress.close( );
+  }
+  else {
+    std::cout << '\n';
+    domain.print_disp( disp_func );
+    std::cout << '\n';
+    domain.print_stress( stress_func );
+  }
 
   return 0;
 }
