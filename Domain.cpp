@@ -256,3 +256,21 @@ void Domain::update_nodes( const Eigen::VectorXd & displacement )
     }
   }
 }
+
+/* -------------------------------------------------------------------------- */
+
+/* Given a string, a field width, and an output stream, center the string and
+ * print to the output. */
+void Domain::print_centered( const std::string & str,
+    std::size_t width, std::ostream & out ) const
+{
+  // Create the header string;
+  int num_blanks = ( width - str.size( ) ) / 2;
+  std::string header =
+    std::string( num_blanks, ' ' ) + str + std::string( num_blanks, ' ' );
+  if( header.size( ) < width )
+    header += std::string( width - header.size( ), ' ' );
+
+  // Print to output;
+  out << header;
+}

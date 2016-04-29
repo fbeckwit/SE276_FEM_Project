@@ -20,6 +20,7 @@
 
 // System headers;
 #include <cstddef>
+#include <iomanip>
 #include <iostream>
 #include <Eigen/LU>
 #include <utility>
@@ -135,6 +136,69 @@ public:
   Eigen::Vector2d get_gradient_matrix( double xi, std::size_t a ) const;
 
   inline std::size_t get_id( ) const { return ele_ID; }
+
+  /* Given a function object representing the exact solution, the field width,
+   * an output stream, and the number of points to print, calculate the
+   * displacements (exact and FEM) and print to the output stream. */
+  template <typename Func>
+    void print_disp( const Func & exact, std::size_t width,
+        std::ostream & out = std::cout, std::size_t num_pts = 11 ) const
+    {
+      // Get the radius and displacements over the element;
+      std::vector<double> radius = interp_coord( num_pts );
+      std::vector<double> disp = interp_disp( num_pts );
+
+      // Get the exact solution and the error from the function object;
+      std::vector<double> disp_exact( num_pts );
+      std::vector<double> disp_error( num_pts );
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        disp_exact[i] = exact( radius[i] );
+        disp_error[i] = disp_exact[i] - disp[i];
+      }
+
+      // Output the information;
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        out << std::setw( width ) << radius[i];
+        out << std::setw( width ) << disp[i];
+        out << std::setw( width ) << disp_exact[i];
+        out << std::setw( width ) << disp_error[i];
+        out << '\n';
+      }
+    }
+
+  /* Given a function object representing the exact solution, the field width,
+   * an output stream, and the number of points to print, calculate the stresses
+   * (exact and FEM) and print to the output stream. */
+  template <typename Func>
+    void print_stress( const Func & exact, std::size_t width,
+        std::ostream & out = std::cout, std::size_t num_pts = 11 ) const
+    {
+      // Typedef;
+      using Vector_array = std::vector<Eigen::Vector3d>;
+
+      // Get the radius and displacements over the element;
+      std::vector<double> radius = interp_coord( num_pts );
+      Vector_array stress = interp_stress( num_pts );
+
+      // Get the exact solution and the error from the function object;
+      Vector_array stress_exact( num_pts, Eigen::Vector3d::Zero( ) );
+      Vector_array stress_error( num_pts, Eigen::Vector3d::Zero( ) );
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        stress_exact[i] = exact( radius[i] );
+        stress_error[i] = stress_exact[i] - stress[i];
+      }
+
+      // Output the information;
+      for( std::size_t i{ 0 }; i != num_pts; ++i ) {
+        out << std::setw( width ) << radius[i];
+        for( std::size_t j{ 0 }; j != 3; ++j ) {
+          out << std::setw( width ) << stress[i][j];
+          out << std::setw( width ) << stress_exact[i][j];
+          out << std::setw( width ) << stress_error[i][j];
+        }
+        out << '\n';
+      }
+    }
 
 private:
 
