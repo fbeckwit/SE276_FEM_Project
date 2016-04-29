@@ -83,6 +83,13 @@ public:
   void print_disp( std::ostream & out = std::cout,
                      std::size_t num_pts = 11 ) const;
 
+  /* Given an output stream and the number of stress points to print for each
+   * element, compute the stress and print to the output. */
+  void print_stress( std::ostream & out = std::cout,
+                     std::size_t num_pts = 11 ) const;
+
+  /* *********************  TEMPLATE MEMBER FUNCTIONS  ********************** */
+
   /* Given a function object to calculate the exact displacement, an output
    * stream,  and the number of displacement points to print for each element,
    * compute the displacement and print to the output. */
@@ -111,11 +118,6 @@ public:
     // Reset precision and format;
     out << std::fixed << std::setprecision( prec );
   }
-
-  /* Given an output stream and the number of stress points to print for each
-   * element, compute the stress and print to the output. */
-  void print_stress( std::ostream & out = std::cout,
-                     std::size_t num_pts = 11 ) const;
 
   /* Given a function object to calculate the exact stresses, an output stream,
    * and the number of stress points to print for each element, compute the
