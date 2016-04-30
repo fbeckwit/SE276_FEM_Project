@@ -29,34 +29,32 @@ class Element {
 
 public:
 
-  static const std::size_t NEN = 2;
-
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
   Element( ) :
-    nodes{ nullptr, nullptr }, stiff_eval( this ), material{ nullptr },
-    length{0.0}, ele_ID{ 0 }
+    nodes{ }, stiff_eval( this ), material{ nullptr },
+    ele_ID{ 0 }, length{0.0}, NEN{ 0 }
   { }
 
-  Element( std::size_t id, Node *n0, Node *n1, const Material *mat ) :
-    nodes{ n0, n1 }, stiff_eval( this ),  material{ mat->clone( ) },
-    length{ 0.0 }, ele_ID{ id }
+  Element( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
+    nodes{ nodes }, stiff_eval( this ),  material{ mat->clone( ) },
+    ele_ID{ id }, length{ 0.0 }, NEN{ nodes.size( ) }
   {
-    length = n1->get_coord( ) - n0->get_coord( );
+    length = nodes.back( )->get_coord( ) - nodes.front( )->get_coord( );
   }
 
   /* Copy Constructor */
   Element( const Element & other ) :
     nodes{ other.nodes }, stiff_eval( this ),
     material{ other.material->clone( ) },
-    length{ other.length }, ele_ID{ other.ele_ID }
+    ele_ID{ other.ele_ID }, length{ other.length }, NEN{ other.NEN }
   { }
 
   /* Move Constructor */
   Element( Element && other ) :
     nodes{ std::move( other.nodes ) }, stiff_eval( this ),
     material{ other.material },
-    length{ other.length }, ele_ID{ other.ele_ID }
+    ele_ID{ other.ele_ID }, length{ other.length }, NEN{ other.NEN }
   {
     other.nodes = { nullptr, nullptr };
     other.material = nullptr;
@@ -82,6 +80,11 @@ public:
 
   /* Returns the internal force acting on the element due to strain energy. */
   Eigen::MatrixXd get_force_int( ) const;
+
+  /* Return the number of element nodes. */
+  std::size_t num_nodes( ) const {
+    return NEN;
+  }
 
   /* Given the local node number, return the node type. */
   inline Node::node_type get_node_type( std::size_t a ) const {
@@ -121,13 +124,11 @@ public:
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
-  static double shape_func( double xi, std::size_t a );
+  virtual double shape_func( double xi, std::size_t a ) const = 0;
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function derivative. */
-  static inline double shape_deriv( std::size_t a ) {
-    return ( a == 0 ) ? -0.5 : 0.5;
-  }
+  virtual double shape_deriv( std::size_t a ) const = 0;
 
   /* Given the local node number (and eventually DOF number), return the global
    * equation number using the `LM' array. */
@@ -137,7 +138,10 @@ public:
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B. */
-  Eigen::Vector2d get_gradient_matrix( double xi, std::size_t a ) const;
+  virtual Eigen::VectorXd get_gradient_matrix(
+      double xi,
+      std::size_t a
+      ) const = 0;
 
   inline std::size_t get_id( ) const { return ele_ID; }
 
@@ -239,7 +243,6 @@ private:
   std::vector<Node *> nodes;
   Stiff_Eval stiff_eval;
   Material *material;
-  double length;
   std::size_t ele_ID;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
@@ -247,6 +250,12 @@ private:
   /* Given the number of intervals, return a set of equally spaced points over
    * the parametric domain. */
   static std::vector<double> get_points( std::size_t num_pts = 11 );
+
+protected:
+
+  /* ***********************  PROTECTED DATA MEMBERS  *********************** */
+  double length;
+  const std::size_t NEN;
 
 };
 

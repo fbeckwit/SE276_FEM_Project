@@ -17,8 +17,6 @@
 // System headers;
 #include <vector>
 
-const std::size_t Element::NEN;
-
 /* *****************************  COPY CONTROL  ***************************** */
 
 
@@ -76,7 +74,7 @@ Eigen::MatrixXd Element::get_force_int( ) const
 /* Given an output stream, print the node locations. */
 void Element::print_nodes( std::ostream &out ) const
 {
-  for ( int a{ 0 }; a != NEN; ++a )
+  for ( std::size_t a{ 0 }; a != NEN; ++a )
     out << nodes[ a ]->get_coord( ) << '\n';
 }
 
@@ -88,7 +86,7 @@ double Element::interp_coord( double xi ) const
 {
   // Sum N_a * x_a;
   double coord{0};
-  for( int a{0}; a != NEN; ++a )
+  for( std::size_t a{ 0 }; a != NEN; ++a )
     coord += shape_func( xi, a ) * nodes[a]->coord;
   return coord;
 }
@@ -117,7 +115,7 @@ double Element::interp_disp( double xi ) const
 {
   // Sum N_a * d_a;
   double disp{0};
-  for( int a{0}; a != NEN; ++a )
+  for( std::size_t a{ 0 }; a != NEN; ++a )
     disp += shape_func( xi, a ) * nodes[a]->disp;
   return disp;
 }
@@ -172,40 +170,6 @@ std::vector<Eigen::Vector3d> Element::interp_stress( std::size_t num_pts) const
   return stress;
 }
 
-/* -------------------------------------------------------------------------- */
-
-/* Given the parametric coordinate, xi, and the local index of the shape
- * function, a, return the value of the shape function.  */
-double Element::shape_func( double xi, std::size_t a )
-{
-  // Determine the appropriate value of xi_a;
-  int xi_a = ( a == 0 ) ? -1 : 1;
-
-  // Calculate shape function and return;
-  return 0.5 * ( 1 + xi_a * xi );
-}
-
-/* -------------------------------------------------------------------------- */
-
-/* Given the parametric coordinate, xi, and the local index of the shape
- * function, a, return the value of the gradient matrix, B. */
-Eigen::Vector2d Element::get_gradient_matrix( double xi, std::size_t a ) const
-{
-  // Determine the appropriate value of xi_a;
-  int xi_a = ( a == 0 ) ? -1 : 1;
-
-  // Calculate coefficients used in gradient matrix;
-  double radius = interp_coord( xi );
-  double N_a = shape_func( xi, a );
-
-  // Build the gradient matrix;
-  Eigen::Vector2d B_a;
-  B_a[0] = xi_a / length;
-  B_a[1] = N_a / radius;
-
-  return B_a;
-}
-
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
 
 /* Given the number of intervals, return a set of equally spaced points over the
@@ -221,6 +185,8 @@ std::vector<double> Element::get_points( std::size_t num_pts )
     xi[i] = -1.0 + i * cell_size;
   return xi;
 }
+
+/* -------------------------------------------------------------------------- */
 
 double Element::Stiff_Eval::operator()( double xi ) const
 {

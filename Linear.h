@@ -21,26 +21,45 @@
 
 // System headers;
 #include <cstddef>
-#include <iomanip>
 #include <iostream>
 #include <Eigen/LU>
-#include <utility>
+#include <vector>
 
 class Linear : public Element {
 
 public:
 
   /* ****************************  COPY CONTROL  **************************** */
-  /* Default constructor */
 
+  /* Default constructor */
   Linear( ) : Element( )
   { }
 
-  Linear( std::size_t id, Node *n0, Node *n1, const Material *mat ) :
-    Element( id, n0, n1, mat )
-  { }
+  Linear( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
+    Element( id, nodes, mat )
+  {
+    if( NEN != 2 )
+      ; // TODO:  Put an actual exception here (not sure which to use);
+  }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
+
+  /* Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the shape function. */
+  virtual double shape_func( double xi, std::size_t a ) const;
+
+  /* Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the shape function derivative. */
+  virtual double shape_deriv( std::size_t a ) const {
+    return ( a == 0 ) ? -0.5 : 0.5;
+  }
+
+  /* Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the gradient matrix, B. */
+  virtual Eigen::VectorXd get_gradient_matrix(
+      double xi,
+      std::size_t a
+      ) const;
 
 };
 

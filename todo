@@ -4,6 +4,7 @@ constructor.
   -> integration point will have a unique material with different state.
 
 Make the Element a base class from which other elements such as quadratics or
-u-p formulations can be derived.
+u-p formulations can be derived. ----------------  DONE!
+  -> Continue identifying functions that need specialization and make virtual.
 
 Do the same for materials.
