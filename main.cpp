@@ -12,7 +12,6 @@
 
 // Project-specific headers;
 #include "Domain.h"
-#include "Element.h"
 #include "exact.h"
 #include "gauss_quadrature.h"
 #include "Material.h"

@@ -15,7 +15,7 @@
 #define GUARD_DOMAIN_H
 
 // Project-specific headers;
-#include "Element.h"
+#include "Linear.h"
 #include "Material.h"
 #include "Node.h"
 

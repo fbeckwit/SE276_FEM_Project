@@ -73,7 +73,7 @@ void Domain::create_element(
   // Use current size of elements as ID of new element;
   std::size_t ele_ID = elements.size( );
   elements.push_back(
-      new Element( ele_ID, nodes[n0], nodes[n1], materials[mat_id] )
+      new Linear( ele_ID, nodes[n0], nodes[n1], materials[mat_id] )
       );
 }
 

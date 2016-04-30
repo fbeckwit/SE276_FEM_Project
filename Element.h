@@ -68,7 +68,7 @@ public:
   Element & operator=( const Element & other ) = delete;
   Element && operator=( Element && other ) = delete;
 
-  ~Element( ) { delete material; }
+  virtual ~Element( ) { delete material; }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
