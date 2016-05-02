@@ -75,9 +75,14 @@ void Domain::create_element( std::vector<std::size_t> _nodes, std::size_t mat_id
     node_ptrs.push_back( nodes[id] );
 
   // Create the element
-  elements.push_back(
-      new Linear( ele_ID, node_ptrs, materials[mat_id] )
-      );
+  Element * ele{ nullptr };
+  if( node_ptrs.size( ) == 2 )
+    ele = new Linear( ele_ID, node_ptrs, materials[mat_id] );
+  else if( node_ptrs.size( ) == 3 )
+    ele = new Quadratic( ele_ID, node_ptrs, materials[mat_id] );
+  else
+    ; // TODO:  Throw an exception;
+  elements.push_back( ele );
 }
 
 /* -------------------------------------------------------------------------- */

@@ -18,6 +18,7 @@
 #include "Linear.h"
 #include "Material.h"
 #include "Node.h"
+#include "Quadratic.h"
 
 // System headers;
 #include <Eigen/Cholesky>

@@ -72,7 +72,7 @@ public:
 
   /* Returns the stiffness matrix for the given element using the current
    * consistent tangent. */
-  Eigen::MatrixXd get_stiffness( std::size_t int_order = 2 );
+  Eigen::MatrixXd get_stiffness( std::size_t int_order );
 
   /* Returns the external force acting on the element from tractions and body
    * forces. */

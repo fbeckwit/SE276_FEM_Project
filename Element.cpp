@@ -48,7 +48,7 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
  * forces. */
 Eigen::MatrixXd Element::get_force_ext( ) const
 {
-  Eigen::VectorXd force( 2 );
+  Eigen::VectorXd force = Eigen::VectorXd::Zero( NEN );
   force.setZero( );
 
   // Check if node is on the natural boundary (Node::NBC) and calc the force;
@@ -242,10 +242,11 @@ double Element::Stiff_Eval::operator()( double xi ) const
   // Get required matrices and info;
   Eigen::Matrix2d elastic_mod = parent->material->get_tangent( );
   double radius = parent->interp_coord( xi );
+  double rad_deriv = parent->interp_coord_deriv( xi );
   Eigen::Vector2d B_a = parent->get_gradient_matrix( xi, a );
   Eigen::Vector2d B_b = parent->get_gradient_matrix( xi, b );
 
   // Calculate value;
   double ret = ( B_a.transpose( ) * elastic_mod * B_b ).value( );
-  return ret * radius * parent->length / 2.0;
+  return ret * radius * rad_deriv;
 }
