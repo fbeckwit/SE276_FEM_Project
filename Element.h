@@ -33,12 +33,12 @@ public:
   /* Default constructor */
   Element( ) :
     nodes{ }, stiff_eval( this ), material{ nullptr },
-    ele_ID{ 0 }, length{0.0}, NEN{ 0 }
+    ele_ID{ 0 }, length{0.0}
   { }
 
   Element( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
     nodes{ nodes }, stiff_eval( this ),  material{ mat->clone( ) },
-    ele_ID{ id }, length{ 0.0 }, NEN{ nodes.size( ) }
+    ele_ID{ id }, length{ 0.0 }
   {
     length = nodes.back( )->get_coord( ) - nodes.front( )->get_coord( );
   }
@@ -47,14 +47,14 @@ public:
   Element( const Element & other ) :
     nodes{ other.nodes }, stiff_eval( this ),
     material{ other.material->clone( ) },
-    ele_ID{ other.ele_ID }, length{ other.length }, NEN{ other.NEN }
+    ele_ID{ other.ele_ID }, length{ other.length }
   { }
 
   /* Move Constructor */
   Element( Element && other ) :
     nodes{ std::move( other.nodes ) }, stiff_eval( this ),
     material{ other.material },
-    ele_ID{ other.ele_ID }, length{ other.length }, NEN{ other.NEN }
+    ele_ID{ other.ele_ID }, length{ other.length }
   {
     other.nodes = { nullptr, nullptr };
     other.material = nullptr;
@@ -82,8 +82,8 @@ public:
   Eigen::MatrixXd get_force_int( ) const;
 
   /* Return the number of element nodes. */
-  std::size_t num_nodes( ) const {
-    return NEN;
+  std::size_t get_num_nodes( ) const {
+    return nodes.size( );
   }
 
   /* Given the local node number, return the node type. */
@@ -260,7 +260,6 @@ protected:
 
   /* ***********************  PROTECTED DATA MEMBERS  *********************** */
   double length;
-  const std::size_t NEN;
 
 };
 

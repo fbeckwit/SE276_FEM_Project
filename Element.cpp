@@ -27,9 +27,10 @@
 Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
 {
   // Calculate the stiffness matrix;
-  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( NEN, NEN );
-  for( std::size_t a{ 0 }; a != NEN; ++a ) {
-    for( std::size_t b{ a }; b != NEN; ++b) {
+  std::vector<Node *>::size_type num_nodes = nodes.size( );
+  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( num_nodes, num_nodes );
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {
+    for( std::vector<Node *>::size_type b{ a }; b != nodes.size( ); ++b ) {
 
       stiff_eval.set_indeces( a, b );
       stiffness( a, b ) = util::integrate( stiff_eval, int_order );
@@ -48,11 +49,11 @@ Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
  * forces. */
 Eigen::MatrixXd Element::get_force_ext( ) const
 {
-  Eigen::VectorXd force = Eigen::VectorXd::Zero( NEN );
+  Eigen::VectorXd force = Eigen::VectorXd::Zero( nodes.size( ) );
   force.setZero( );
 
   // Check if node is on the natural boundary (Node::NBC) and calc the force;
-  for( std::size_t a{ 0 }; a != NEN; ++a ) {
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {
     if( nodes[a]->type == Node::NBC )
       force[a] = nodes[a]->bound_cond * nodes[a]->coord;
     else
@@ -74,7 +75,7 @@ Eigen::MatrixXd Element::get_force_int( ) const
 /* Given an output stream, print the node locations. */
 void Element::print_nodes( std::ostream &out ) const
 {
-  for ( std::size_t a{ 0 }; a != NEN; ++a )
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
     out << nodes[ a ]->get_coord( ) << '\n';
 }
 
@@ -86,7 +87,7 @@ double Element::interp_coord( double xi ) const
 {
   // Sum N_a * x_a;
   double coord{0};
-  for( std::size_t a{ 0 }; a != NEN; ++a )
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
     coord += shape_func( xi, a ) * nodes[a]->coord;
   return coord;
 }
@@ -115,7 +116,7 @@ double Element::interp_coord_deriv( double xi ) const
 {
   // Sum dN_a * x_a;
   double coord_deriv{0};
-  for( std::size_t a{ 0 }; a != NEN; ++a )
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
     coord_deriv += shape_deriv( xi, a ) * nodes[a]->coord;
   return coord_deriv;
 }
@@ -144,7 +145,7 @@ double Element::interp_disp( double xi ) const
 {
   // Sum N_a * d_a;
   double disp{0};
-  for( std::size_t a{ 0 }; a != NEN; ++a )
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
     disp += shape_func( xi, a ) * nodes[a]->disp;
   return disp;
 }
@@ -176,7 +177,7 @@ Eigen::Vector3d Element::interp_stress( double xi ) const
   // Calculate the strain components and pass to the material to get the stress;
   Eigen::Vector2d strain;
   strain.setZero( );
-  for( std::size_t a{ 0 }; a != NEN; ++a )
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
     strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
 
   return material->get_stress( strain );

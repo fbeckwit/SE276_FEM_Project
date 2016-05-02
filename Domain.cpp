@@ -117,8 +117,8 @@ Eigen::MatrixXd Domain::build_stiffness( std::size_t int_order )
     Element * elem = *elem_it;
 
     Eigen::MatrixXd stiff_elem = elem->get_stiffness( int_order );
-    for( std::size_t a{ 0 }; a != elem->num_nodes( ); ++a ) {
-      for( std::size_t b{ 0 }; b != elem->num_nodes( ); ++b ) {
+    for( std::size_t a{ 0 }; a != elem->get_num_nodes( ); ++a ) {
+      for( std::size_t b{ 0 }; b != elem->get_num_nodes( ); ++b ) {
 
         // Check if node is free or not;
         if( elem->get_node_type( a ) != Node::EBC &&
@@ -152,7 +152,7 @@ Eigen::VectorXd Domain::build_force( )
     Element * elem = *elem_it;
 
     Eigen::VectorXd force_elem = elem->get_force_ext( );
-    for( std::size_t a{ 0 }; a != elem->num_nodes( ); ++a ) {
+    for( std::size_t a{ 0 }; a != elem->get_num_nodes( ); ++a ) {
 
       // Check if node is free or not;
       if( elem->get_node_type( a ) != Node::EBC ) {

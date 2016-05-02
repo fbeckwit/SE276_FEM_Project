@@ -38,7 +38,7 @@ public:
   Quadratic( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
     Element( id, nodes, mat )
   {
-    if( NEN != 3 )
+    if( get_num_nodes( ) != 3 )
       ; // TODO:  Put an actual exception here (not sure which to use);
   }
 
