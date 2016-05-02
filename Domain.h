@@ -61,7 +61,7 @@ public:
   /* Given the node ids and a material id, create an element and store in
    * `elements.'
    * PRECONDITION:  Nodes `n0' and `n1' and material `mat_id' must be created */
-  void create_element( std::size_t n0, std::size_t n1, std::size_t mat_id );
+  void create_element( std::vector<std::size_t> _nodes, std::size_t mat_id );
 
   /* Count the number of equations corresponding to free DOFs and store. */
   std::size_t get_eqn_count( );

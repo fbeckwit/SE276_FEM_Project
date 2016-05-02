@@ -84,7 +84,7 @@ int main( int argc, char *argv[] )
   // Create elements;
   std::cout << "    Elements ...\n";
   for( std::size_t ele_i{ 0 }; ele_i != num_elem; ++ele_i ) {
-    domain.create_element( ele_i, ele_i + 1, 0 );
+    domain.create_element( {ele_i, ele_i + 1}, 0 );
   }
 
   // Solve system of equations;

@@ -64,19 +64,19 @@ void Domain::create_node( double coord, Node::node_type type, double bc )
 /* Given the node ids and a material id, create an element and store in
  * `elements.'
  * PRECONDITION:  Nodes `n0' and `n1' and material `mat_id' must be created */
-void Domain::create_element(
-    std::size_t n0,
-    std::size_t n1,
-    std::size_t mat_id
-    )
+void Domain::create_element( std::vector<std::size_t> _nodes, std::size_t mat_id )
 {
   // Use current size of elements as ID of new element;
   std::size_t ele_ID = elements.size( );
 
-  // Get the element nodes;
-  std::vector<Node *> node_ele = { nodes[n0], nodes[n1] };
+  // Get the node pointers from the vector of node IDs passed in;
+  std::vector<Node *> node_ptrs;
+  for( auto id : _nodes )
+    node_ptrs.push_back( nodes[id] );
+
+  // Create the element
   elements.push_back(
-      new Linear( ele_ID, node_ele, materials[mat_id] )
+      new Linear( ele_ID, node_ptrs, materials[mat_id] )
       );
 }
 
