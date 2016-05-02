@@ -109,6 +109,35 @@ std::vector<double> Element::interp_coord( std::size_t num_pts) const
 
 /* -------------------------------------------------------------------------- */
 
+/* Given the parametric coordinate, xi, interpolate the derivative of the
+ * coordinate within the element. */
+double Element::interp_coord_deriv( double xi ) const
+{
+  // Sum dN_a * x_a;
+  double coord_deriv{0};
+  for( std::size_t a{ 0 }; a != NEN; ++a )
+    coord_deriv += shape_deriv( xi, a ) * nodes[a]->coord;
+  return coord_deriv;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the number of points to print, interpolate the derivatives of the
+ * coordinates within the element. */
+std::vector<double> Element::interp_coord_deriv( std::size_t num_pts) const
+{
+  // Get the points over the parametric domain;
+  std::vector<double> xi = get_points( num_pts );
+
+  // Loop the points, interpolate the displacement, and return;
+  std::vector<double> coord( num_pts );
+  for( std::size_t i{ 0 }; i != num_pts; ++i )
+    coord[i] = interp_coord_deriv( xi[i] );
+  return coord;
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* Given the parametric coordinate, xi, interpolate the displacement within the
  * element. */
 double Element::interp_disp( double xi ) const
@@ -151,6 +180,26 @@ Eigen::Vector3d Element::interp_stress( double xi ) const
     strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
 
   return material->get_stress( strain );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the parametric coordinate, xi, and the local index of the shape
+ * function, a, return the value of the gradient matrix, B. */
+Eigen::VectorXd Element::get_gradient_matrix( double xi, std::size_t a ) const
+{
+  // Calculate coefficients used in gradient matrix;
+  double radius = interp_coord( xi );
+  double rad_deriv = interp_coord_deriv( xi );
+  double N_a = shape_func( xi, a );
+  double dN_a = shape_deriv( xi, a );
+
+  // Build the gradient matrix;
+  Eigen::VectorXd B_a = Eigen::VectorXd::Zero( 2 );
+  B_a[0] = dN_a / rad_deriv;
+  B_a[1] = N_a / radius;
+
+  return B_a;
 }
 
 /* -------------------------------------------------------------------------- */

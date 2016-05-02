@@ -50,16 +50,9 @@ public:
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function derivative. */
-  virtual double shape_deriv( std::size_t a ) const {
+  virtual double shape_deriv( double, std::size_t a ) const {
     return ( a == 0 ) ? -0.5 : 0.5;
   }
-
-  /* Given the parametric coordinate, xi, and the local index of the shape
-   * function, a, return the value of the gradient matrix, B. */
-  virtual Eigen::VectorXd get_gradient_matrix(
-      double xi,
-      std::size_t a
-      ) const;
 
 };
 

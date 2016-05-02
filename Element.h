@@ -102,6 +102,14 @@ public:
    * element. */
   std::vector<double> interp_coord( std::size_t num_pts = 11 ) const;
 
+  /* Given the parametric coordinate, xi, interpolate the derivative of the
+   * coordinate within the element. */
+  double interp_coord_deriv( double xi ) const;
+
+  /* Given the number of points to print, interpolate the derivatives of the
+   * coordinates within the element. */
+  std::vector<double> interp_coord_deriv( std::size_t num_pts) const;
+
   /* Given the parametric coordinate, xi, interpolate the displacement within
    * the element.
    * PRECONDITION:  Nodes must have updated displacements. */
@@ -128,7 +136,7 @@ public:
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function derivative. */
-  virtual double shape_deriv( std::size_t a ) const = 0;
+  virtual double shape_deriv( double xi, std::size_t a ) const = 0;
 
   /* Given the local node number (and eventually DOF number), return the global
    * equation number using the `LM' array. */
@@ -138,10 +146,7 @@ public:
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the gradient matrix, B. */
-  virtual Eigen::VectorXd get_gradient_matrix(
-      double xi,
-      std::size_t a
-      ) const = 0;
+  Eigen::VectorXd get_gradient_matrix( double xi, std::size_t a) const;
 
   inline std::size_t get_id( ) const { return ele_ID; }
 
