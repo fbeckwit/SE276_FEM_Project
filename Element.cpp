@@ -22,29 +22,6 @@
 
 /* ***********************  PUBLIC MEMBER FUNCTIONS  ************************ */
 
-/* Returns the stiffness matrix for the given element using the current
- * consistent tangent. */
-Eigen::MatrixXd Element::get_stiffness( std::size_t int_order )
-{
-  // Calculate the stiffness matrix;
-  std::vector<Node *>::size_type num_nodes = nodes.size( );
-  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( num_nodes, num_nodes );
-  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {
-    for( std::vector<Node *>::size_type b{ a }; b != nodes.size( ); ++b ) {
-
-      stiff_eval.set_indeces( a, b );
-      stiffness( a, b ) = util::integrate( stiff_eval, int_order );
-
-      // If we're calculating off-diagonal terms, copy to the lower triangle;
-      if ( a != b )
-        stiffness( b, a ) = stiffness( a, b );
-    }
-  }
-  return stiffness;
-}
-
-/* -------------------------------------------------------------------------- */
-
 /* Returns the external force acting on the element from tractions and body
  * forces. */
 Eigen::MatrixXd Element::get_force_ext( ) const
@@ -250,4 +227,27 @@ double Element::Stiff_Eval::operator()( double xi ) const
   // Calculate value;
   double ret = ( B_a.transpose( ) * elastic_mod * B_b ).value( );
   return ret * radius * rad_deriv;
+}
+
+/* **********************  PROTECTED MEMBER FUNCTIONS  ********************** */
+
+/* Returns the stiffness matrix for the given element using the current
+ * consistent tangent. */
+Eigen::MatrixXd Element::def_stiffness( std::size_t int_order )
+{
+  // Calculate the stiffness matrix;
+  std::vector<Node *>::size_type num_nodes = nodes.size( );
+  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( num_nodes, num_nodes );
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {
+    for( std::vector<Node *>::size_type b{ a }; b != nodes.size( ); ++b ) {
+
+      stiff_eval.set_indeces( a, b );
+      stiffness( a, b ) = util::integrate( stiff_eval, int_order );
+
+      // If we're calculating off-diagonal terms, copy to the lower triangle;
+      if ( a != b )
+        stiffness( b, a ) = stiffness( a, b );
+    }
+  }
+  return stiffness;
 }

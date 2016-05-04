@@ -44,13 +44,21 @@ public:
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
+  /* Returns the stiffness matrix for the given element using the current
+   * consistent tangent. */
+  virtual Eigen::MatrixXd get_stiffness( std::size_t int_order )
+  {
+    return def_stiffness( int_order );
+  }
+
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
   virtual double shape_func( double xi, std::size_t a ) const;
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function derivative. */
-  virtual double shape_deriv( double, std::size_t a ) const {
+  virtual double shape_deriv( double, std::size_t a ) const
+  {
     return ( a == 0 ) ? -0.5 : 0.5;
   }
 
