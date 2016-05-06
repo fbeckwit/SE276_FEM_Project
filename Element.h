@@ -32,32 +32,26 @@ public:
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
   Element( ) :
-    nodes{ }, stiff_eval( this ), material{ nullptr },
-    ele_ID{ 0 }, length{0.0}
+    nodes{ }, length{0.0}, ele_ID{ 0 }
   { }
 
-  Element( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
-    nodes{ nodes }, stiff_eval( this ),  material{ mat->clone( ) },
-    ele_ID{ id }, length{ 0.0 }
+  Element( std::size_t id, std::vector<Node *> nodes ) :
+    nodes{ nodes }, length{ 0.0 }, ele_ID{ id }
   {
     length = nodes.back( )->get_coord( ) - nodes.front( )->get_coord( );
   }
 
   /* Copy Constructor */
   Element( const Element & other ) :
-    nodes{ other.nodes }, stiff_eval( this ),
-    material{ other.material->clone( ) },
-    ele_ID{ other.ele_ID }, length{ other.length }
+    nodes{ other.nodes }, length{ other.length }, ele_ID{ other.ele_ID }
   { }
 
   /* Move Constructor */
   Element( Element && other ) :
-    nodes{ std::move( other.nodes ) }, stiff_eval( this ),
-    material{ other.material },
-    ele_ID{ other.ele_ID }, length{ other.length }
+    nodes{ std::move( other.nodes ) }, length{ other.length },
+    ele_ID{ other.ele_ID }
   {
     other.nodes = { nullptr, nullptr };
-    other.material = nullptr;
     other.length = 0.0;
     other.ele_ID = 0;
   }
@@ -66,7 +60,7 @@ public:
   Element & operator=( const Element & other ) = delete;
   Element && operator=( Element && other ) = delete;
 
-  virtual ~Element( ) { delete material; }
+  virtual ~Element( ) { }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
 
@@ -123,7 +117,7 @@ public:
   /* Given the parametric coordinate, xi, interpolate the stresses from the
    * resulting displacement.
    * PRECONDITION:  Nodes must have updated displacements. */
-  Eigen::Vector3d interp_stress( double xi ) const;
+  virtual Eigen::Vector3d interp_stress( double xi ) const = 0;
 
   /* Given the number of points to print, interpolate the stresses from the
    * resulting displacement.
@@ -213,41 +207,17 @@ public:
       }
     }
 
+protected:
+
+  /* ***********************  PROTECTED DATA MEMBERS  *********************** */
+
+  std::vector<Node *> nodes;
+  double length;
+
 private:
-
-  /* ***************************  NESTED CLASSES  *************************** */
-
-  /* Function object used in the evaluation of the stiffness matrix.  operator()
-   * overloaded to return the internal energy density at the evaluation point,
-   * xi. */
-  struct Stiff_Eval {
-
-    /* Constructor */
-    Stiff_Eval( const Element * p, std::size_t _a = 0, std::size_t _b = 0 ) :
-      parent{ p }, a{ _a }, b{ _b }
-    { }
-
-    /* Set the indeces as given.  Called before using integrate so that the
-     * correct submatrix k_{ab} is calculated. */
-    inline void set_indeces( std::size_t _a, std::size_t _b ) {
-      a = _a;
-      b = _b;
-    }
-
-    /* Given a parametric coordinate, xi, calculate the internal energy density
-     * of the stiffness. */
-    double operator()( double xi ) const;
-
-    const Element * parent;
-    std::size_t a;
-    std::size_t b;
-  };
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
-  std::vector<Node *> nodes;
-  Stiff_Eval stiff_eval;
-  Material *material;
   std::size_t ele_ID;
 
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
@@ -255,17 +225,6 @@ private:
   /* Given the number of intervals, return a set of equally spaced points over
    * the parametric domain. */
   static std::vector<double> get_points( std::size_t num_pts = 11 );
-
-protected:
-
-  /* ***********************  PROTECTED DATA MEMBERS  *********************** */
-  double length;
-
-  /* *********************  PROTECTED MEMBER FUNCTIONS  ********************* */
-
-  /* Returns the stiffness matrix for the given element using the current
-   * consistent tangent. */
-  Eigen::MatrixXd def_stiffness( std::size_t int_order );
 
 };
 

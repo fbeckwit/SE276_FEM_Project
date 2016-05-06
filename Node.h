@@ -23,6 +23,7 @@
 class Node {
 
   friend class Element;
+  friend class Disp_Ele;
 
 public:
 

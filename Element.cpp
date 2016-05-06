@@ -146,18 +146,19 @@ std::vector<double> Element::interp_disp( std::size_t num_pts) const
 
 /* -------------------------------------------------------------------------- */
 
-/* Given the parametric coordinate, xi, return the stresses from the resulting
- * displacement.
+/* Given the number of points to print, interpolate the stresses from the
+ * resulting displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
-Eigen::Vector3d Element::interp_stress( double xi ) const
+std::vector<Eigen::Vector3d> Element::interp_stress( std::size_t num_pts) const
 {
-  // Calculate the strain components and pass to the material to get the stress;
-  Eigen::Vector2d strain;
-  strain.setZero( );
-  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
-    strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
+  // Get the points over the parametric domain;
+  std::vector<double> xi = get_points( num_pts );
 
-  return material->get_stress( strain );
+  // Loop the points, interpolate the displacement, and return;
+  std::vector<Eigen::Vector3d> stress( num_pts );
+  for( std::size_t i{ 0 }; i != num_pts; ++i )
+    stress[i] = interp_stress( xi[i] );
+  return stress;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -180,23 +181,6 @@ Eigen::VectorXd Element::get_gradient_matrix( double xi, std::size_t a ) const
   return B_a;
 }
 
-/* -------------------------------------------------------------------------- */
-
-/* Given the number of points to print, interpolate the stresses from the
- * resulting displacement.
- * PRECONDITION:  Nodes must have updated displacements. */
-std::vector<Eigen::Vector3d> Element::interp_stress( std::size_t num_pts) const
-{
-  // Get the points over the parametric domain;
-  std::vector<double> xi = get_points( num_pts );
-
-  // Loop the points, interpolate the displacement, and return;
-  std::vector<Eigen::Vector3d> stress( num_pts );
-  for( std::size_t i{ 0 }; i != num_pts; ++i )
-    stress[i] = interp_stress( xi[i] );
-  return stress;
-}
-
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
 
 /* Given the number of intervals, return a set of equally spaced points over the
@@ -211,43 +195,4 @@ std::vector<double> Element::get_points( std::size_t num_pts )
   for( std::vector<double>::size_type i{ 0 }; i != num_pts; ++i )
     xi[i] = -1.0 + i * cell_size;
   return xi;
-}
-
-/* -------------------------------------------------------------------------- */
-
-double Element::Stiff_Eval::operator()( double xi ) const
-{
-  // Get required matrices and info;
-  Eigen::Matrix2d elastic_mod = parent->material->get_tangent( );
-  double radius = parent->interp_coord( xi );
-  double rad_deriv = parent->interp_coord_deriv( xi );
-  Eigen::Vector2d B_a = parent->get_gradient_matrix( xi, a );
-  Eigen::Vector2d B_b = parent->get_gradient_matrix( xi, b );
-
-  // Calculate value;
-  double ret = ( B_a.transpose( ) * elastic_mod * B_b ).value( );
-  return ret * radius * rad_deriv;
-}
-
-/* **********************  PROTECTED MEMBER FUNCTIONS  ********************** */
-
-/* Returns the stiffness matrix for the given element using the current
- * consistent tangent. */
-Eigen::MatrixXd Element::def_stiffness( std::size_t int_order )
-{
-  // Calculate the stiffness matrix;
-  std::vector<Node *>::size_type num_nodes = nodes.size( );
-  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( num_nodes, num_nodes );
-  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {
-    for( std::vector<Node *>::size_type b{ a }; b != nodes.size( ); ++b ) {
-
-      stiff_eval.set_indeces( a, b );
-      stiffness( a, b ) = util::integrate( stiff_eval, int_order );
-
-      // If we're calculating off-diagonal terms, copy to the lower triangle;
-      if ( a != b )
-        stiffness( b, a ) = stiffness( a, b );
-    }
-  }
-  return stiffness;
 }

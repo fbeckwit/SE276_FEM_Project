@@ -15,41 +15,32 @@
 #define GUARD_QUADRATIC_H
 
 // Project-specific headers;
-#include "Element.h"
+#include "Disp_Ele.h"
 #include "Material.h"
 #include "Node.h"
 
 // System headers;
 #include <cstddef>
-#include <iostream>
-#include <Eigen/LU>
 #include <vector>
 
-class Quadratic : public Element {
+class Quadratic : public Disp_Ele {
 
 public:
 
   /* ****************************  COPY CONTROL  **************************** */
 
   /* Default constructor */
-  Quadratic( ) : Element( )
+  Quadratic( ) : Disp_Ele( )
   { }
 
   Quadratic( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
-    Element( id, nodes, mat )
+    Disp_Ele( id, nodes, mat )
   {
     if( get_num_nodes( ) != 3 )
       ; // TODO:  Put an actual exception here (not sure which to use);
   }
 
   /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
-
-  /* Returns the stiffness matrix for the given element using the current
-   * consistent tangent. */
-  virtual Eigen::MatrixXd get_stiffness( std::size_t int_order )
-  {
-    return def_stiffness( int_order );
-  }
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
