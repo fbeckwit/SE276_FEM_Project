@@ -1,0 +1,109 @@
+/* ************************************************************************** *
+ *                           Frank Nathan Beckwith                            *
+ *                                                                            *
+ *                                                                            *
+ *                                                                            *
+ * ************************************************************************** *
+ *                                                                            *
+ *                                                                            *
+ *                                                                            *
+ *                                                                            *
+ *                                                                            *
+ * ************************************************************************** */
+
+#ifndef GUARD_UP_ELE_H
+#define GUARD_UP_ELE_H
+
+// Project-specific headers;
+#include "Element.h"
+#include "Material.h"
+#include "Node.h"
+
+// System headers;
+#include <cstddef>
+#include <Eigen/LU>
+#include <utility>
+
+class UP_Ele : public Element {
+
+public:
+
+  /* ****************************  COPY CONTROL  **************************** */
+  /* Default constructor */
+  UP_Ele( ) : Element( ), material( nullptr ), stiff_eval( this ) { }
+
+  UP_Ele( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
+    Element( id, nodes ), material( mat->clone( ) ), stiff_eval( this )
+  { }
+
+  UP_Ele( const UP_Ele & other ) :
+    Element( other ), material{ other.material->clone( ) },
+    stiff_eval( this ) { }
+
+  UP_Ele( UP_Ele && other ) :
+    Element( std::move( other ) ), material{ other.material }, stiff_eval( this )
+  {
+    other.material = nullptr;
+  }
+
+  /* Deleted assignment operators */
+  UP_Ele & operator=( const UP_Ele & ) = delete;
+  UP_Ele && operator=( UP_Ele && ) = delete;
+
+  virtual ~UP_Ele( ) { delete material; }
+
+  /* **********************  PUBLIC MEMBER FUNCTIONS  *********************** */
+
+  /* Returns the stiffness matrix for the given element using the current
+   * consistent tangent. */
+  Eigen::MatrixXd get_stiffness( std::size_t int_order );
+
+  /* Given the parametric coordinate, xi, interpolate the stresses from the
+   * resulting displacement.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  Eigen::Vector3d interp_stress( double xi ) const;
+
+  /* Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the shape function. */
+  virtual double shape_func( double xi, std::size_t a ) const = 0;
+
+  /* Given the parametric coordinate, xi, and the local index of the shape
+   * function, a, return the value of the shape function derivative. */
+  virtual double shape_deriv( double xi, std::size_t a ) const = 0;
+
+protected:
+
+  /* ***********************  PROTECTED DATA MEMBERS  *********************** */
+
+  Material *material;
+
+private:
+
+  /* ***************************  NESTED CLASSES  *************************** */
+
+  /* Function object used in the evaluation of the stiffness matrix.  operator()
+   * overloaded to return the internal energy density at the evaluation point,
+   * xi. */
+  struct K_Func {
+
+    /* Constructor */
+    K_Func( const UP_Ele * p, std::size_t _a = 0, std::size_t _b = 0 ) :
+      parent{ p }, a{ _a }, b{ _b }
+    { }
+
+    /* Given a parametric coordinate, xi, calculate the internal energy density
+     * of the stiffness. */
+    double operator()( double xi ) const;
+
+    const UP_Ele * parent;
+    std::size_t a;
+    std::size_t b;
+  };
+
+  /* ************************  PRIVATE DATA MEMBERS  ************************ */
+
+  K_Func stiff_eval;
+
+};
+
+#endif
