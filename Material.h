@@ -47,6 +47,10 @@ public:
   /* Given the strain, return the resulting stress. */
   Eigen::Vector3d get_stress( const Eigen::Vector2d & strain ) const;
 
+  /* Return the Lamé constants, lambda or mu. */
+  double get_lambda( ) const { return lambda; }
+  double get_mu( ) const { return mu; }
+
 private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
