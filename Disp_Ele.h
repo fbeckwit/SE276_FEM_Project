@@ -16,6 +16,7 @@
 
 // Project-specific headers;
 #include "Element.h"
+#include "gauss_quadrature.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -58,7 +59,10 @@ public:
 
   /* Returns the stiffness matrix for the given element using the current
    * consistent tangent. */
-  Eigen::MatrixXd get_stiffness( std::size_t int_order );
+  Eigen::MatrixXd get_stiffness( std::size_t int_order )
+  {
+    return util::integrate_matrix( stiff_eval, int_order );
+  }
 
   /* Given the parametric coordinate, xi, interpolate the stresses from the
    * resulting displacement.
@@ -92,6 +96,10 @@ private:
     K_Func( const Disp_Ele * p, std::size_t _a = 0, std::size_t _b = 0 ) :
       parent{ p }, a{ _a }, b{ _b }
     { }
+
+    /* Functions to query the size of the final matrix. */
+    std::size_t get_rows( ) const { return parent->nodes.size( ); }
+    std::size_t get_cols( ) const { return parent->nodes.size( ); }
 
     /* Given a parametric coordinate, xi, calculate the internal energy density
      * of the stiffness. */

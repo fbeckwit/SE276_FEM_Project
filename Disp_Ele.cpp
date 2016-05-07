@@ -12,7 +12,6 @@
 
 // Project-specific headers;
 #include "Disp_Ele.h"
-#include "gauss_quadrature.h"
 
 // System headers;
 #include <vector>
@@ -21,30 +20,6 @@
 
 
 /* ***********************  PUBLIC MEMBER FUNCTIONS  ************************ */
-
-/* Returns the stiffness matrix for the given element using the current
- * consistent tangent. */
-Eigen::MatrixXd Disp_Ele::get_stiffness( std::size_t int_order )
-{
-  // Calculate the stiffness matrix;
-  std::vector<Node *>::size_type num_nodes = nodes.size( );
-  Eigen::MatrixXd stiffness = Eigen::MatrixXd::Zero( num_nodes, num_nodes );
-  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {
-    for( std::vector<Node *>::size_type b{ a }; b != nodes.size( ); ++b ) {
-
-      stiff_eval.a = a;
-      stiff_eval.b = b;
-      stiffness( a, b ) = util::integrate( stiff_eval, int_order );
-
-      // If we're calculating off-diagonal terms, copy to the lower triangle;
-      if ( a != b )
-        stiffness( b, a ) = stiffness( a, b );
-    }
-  }
-  return stiffness;
-}
-
-/* -------------------------------------------------------------------------- */
 
 /* Given the parametric coordinate, xi, return the stresses from the resulting
  * displacement.
