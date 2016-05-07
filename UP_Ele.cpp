@@ -48,3 +48,28 @@ double UP_Ele::K_Func::operator()( double xi ) const
   // Calculate value;
   return 0.0;
 }
+
+/* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
+
+/* Returns the stiffness matrix for the given element from the mu-part of the
+ * current consistent tangent of the material. */
+Eigen::MatrixXd UP_Ele::get_K_mu( std::size_t int_order ) const
+{
+  return Eigen::MatrixXd::Zero( 1, 1 );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Returns the discrete gradient operator, G, which acts on pressures. */
+Eigen::MatrixXd UP_Ele::get_G( std::size_t int_order ) const
+{
+  return Eigen::MatrixXd::Zero( 1, 1 );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Returns the discrete constraint operator, M. */
+Eigen::MatrixXd UP_Ele::get_M( std::size_t int_order ) const
+{
+  return Eigen::MatrixXd::Zero( 1, 1 );
+}

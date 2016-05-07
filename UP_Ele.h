@@ -30,18 +30,26 @@ public:
 
   /* ****************************  COPY CONTROL  **************************** */
   /* Default constructor */
-  UP_Ele( ) : Element( ), material( nullptr ), stiff_eval( this ) { }
+  UP_Ele( ) :
+    Element( ), pressure( ), material( nullptr ),
+    stiff_eval( this ), g_eval( this ), m_eval( this )
+  { }
 
   UP_Ele( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
-    Element( id, nodes ), material( mat->clone( ) ), stiff_eval( this )
+    Element( id, nodes ), pressure( ), material( mat->clone( ) ),
+    stiff_eval( this ), g_eval( this ), m_eval( this )
   { }
 
   UP_Ele( const UP_Ele & other ) :
-    Element( other ), material{ other.material->clone( ) },
-    stiff_eval( this ) { }
+    Element( other ), pressure{ other.pressure },
+    material{ other.material->clone( ) },
+    stiff_eval( this ), g_eval( this ), m_eval( this )
+  { }
 
   UP_Ele( UP_Ele && other ) :
-    Element( std::move( other ) ), material{ other.material }, stiff_eval( this )
+    Element( std::move( other ) ), pressure{ std::move( other.pressure ) },
+    material{ other.material },
+    stiff_eval( this ), g_eval( this ), m_eval( this )
   {
     other.material = nullptr;
   }
@@ -63,6 +71,9 @@ public:
    * PRECONDITION:  Nodes must have updated displacements. */
   Eigen::Vector3d interp_stress( double xi ) const;
 
+  /* Given the parametric coordinate, xi, return the divergence matrix, b^v. */
+  double get_divergence_matrix( double xi ) const;
+
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
   virtual double shape_func( double xi, std::size_t a ) const = 0;
@@ -71,10 +82,15 @@ public:
    * function, a, return the value of the shape function derivative. */
   virtual double shape_deriv( double xi, std::size_t a ) const = 0;
 
+  /* Given the parametric coordinate, xi, and the local index of the pressure
+   * shape function, a, return the value of the pressure function. */
+  virtual double pressure_func( double xi, std::size_t a ) const = 0;
+
 protected:
 
   /* ***********************  PROTECTED DATA MEMBERS  *********************** */
 
+  std::vector<double> pressure;
   Material *material;
 
 private:
@@ -87,12 +103,34 @@ private:
   struct K_Func {
 
     /* Constructor */
-    K_Func( const UP_Ele * p, std::size_t _a = 0, std::size_t _b = 0 ) :
-      parent{ p }, a{ _a }, b{ _b }
-    { }
+    K_Func( const UP_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
 
-    /* Given a parametric coordinate, xi, calculate the internal energy density
-     * of the stiffness. */
+    /* Calculate the internal energy density of the stiffness. */
+    double operator()( double xi ) const;
+
+    const UP_Ele * parent;
+    std::size_t a;
+    std::size_t b;
+  };
+
+  struct G_Func {
+    /* Constructor */
+    G_Func( const UP_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
+
+    /* Calculate the internal energy density of the stiffness. */
+    double operator()( double xi ) const;
+
+    const UP_Ele * parent;
+    std::size_t a;
+    std::size_t b;
+  };
+
+  struct M_Func {
+
+    /* Constructor */
+    M_Func( const UP_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
+
+    /* Calculate the internal energy density of the stiffness. */
     double operator()( double xi ) const;
 
     const UP_Ele * parent;
@@ -103,6 +141,20 @@ private:
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
   K_Func stiff_eval;
+  G_Func g_eval;
+  M_Func m_eval;
+
+  /* *********************  PRIVATE MEMBERS FUNCTIONS  ********************** */
+
+  /* Returns the stiffness matrix for the given element from the mu-part of the
+   * current consistent tangent of the material. */
+  Eigen::MatrixXd get_K_mu( std::size_t int_order ) const;
+
+  /* Returns the discrete gradient operator, G, which acts on pressures. */
+  Eigen::MatrixXd get_G( std::size_t int_order ) const;
+
+  /* Returns the discrete constraint operator, M. */
+  Eigen::MatrixXd get_M( std::size_t int_order ) const;
 
 };
 
