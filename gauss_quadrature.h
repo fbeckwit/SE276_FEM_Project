@@ -40,7 +40,11 @@ namespace util {
    * integrate each term, func, integrate the coefficients and return the
    * matrix. */
   template <typename Func>
-  Eigen::MatrixXd integrate_matrix( Func & func, int int_order );
+  Eigen::MatrixXd integrate_matrix(
+      Func & func,
+      int int_order,
+      bool sym = false
+      );
 
 }
 
@@ -66,7 +70,11 @@ double util::integrate( const Func & f, int int_order )
  * integrate each term, func, integrate the coefficients and return the
  * matrix. */
 template <typename Matrix_Func>
-Eigen::MatrixXd util::integrate_matrix( Matrix_Func &func, int int_order )
+Eigen::MatrixXd util::integrate_matrix(
+    Matrix_Func &func,
+    int int_order,
+    bool sym
+    )
 {
   // Get the size of the matrix;
   const std::size_t num_rows = func.get_rows( );
@@ -75,14 +83,14 @@ Eigen::MatrixXd util::integrate_matrix( Matrix_Func &func, int int_order )
   // Calculate the matrix matrix;
   Eigen::MatrixXd matrix = Eigen::MatrixXd::Zero( num_rows, num_cols );
   for( std::size_t a{ 0 }; a != num_rows; ++a ) {
-    for( std::size_t b{ a }; b != num_cols; ++b ) {
-
+    std::size_t b = sym ? a : 0;
+    for( ; b != num_cols; ++b ) {
       func.a = a;
       func.b = b;
       matrix( a, b ) = util::integrate( func, int_order );
 
-      // If we're calculating off-diagonal terms, copy to the lower triangle;
-      if ( a != b )
+      // If symmetric, then copy the M_{ab} term to M_{ba};
+      if( a != b && sym )
         matrix( b, a ) = matrix( a, b );
     }
   }

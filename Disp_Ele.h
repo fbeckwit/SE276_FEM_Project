@@ -61,7 +61,8 @@ public:
    * consistent tangent. */
   Eigen::MatrixXd get_stiffness( std::size_t int_order )
   {
-    return util::integrate_matrix( stiff_eval, int_order );
+    // Call function from quadrature namespace with `sym = true';
+    return util::integrate_matrix( stiff_eval, int_order, true );
   }
 
   /* Given the parametric coordinate, xi, interpolate the stresses from the
