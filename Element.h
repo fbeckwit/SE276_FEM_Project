@@ -117,6 +117,16 @@ public:
   /* Given the parametric coordinate, xi, interpolate the stresses from the
    * resulting displacement.
    * PRECONDITION:  Nodes must have updated displacements. */
+  Eigen::Vector2d interp_strain( double xi ) const;
+
+  /* Given the number of points to print, interpolate the stresses from the
+   * resulting displacement.
+   * PRECONDITION:  Nodes must have updated displacements. */
+  std::vector<Eigen::Vector2d> interp_strain( std::size_t num_pts = 11 ) const;
+
+  /* Given the parametric coordinate, xi, interpolate the stresses from the
+   * resulting displacement.
+   * PRECONDITION:  Nodes must have updated displacements. */
   virtual Eigen::Vector3d interp_stress( double xi ) const = 0;
 
   /* Given the number of points to print, interpolate the stresses from the

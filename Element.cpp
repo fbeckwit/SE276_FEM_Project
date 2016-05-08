@@ -146,10 +146,43 @@ std::vector<double> Element::interp_disp( std::size_t num_pts) const
 
 /* -------------------------------------------------------------------------- */
 
+/* Given the parametric coordinate, xi, interpolate the stresses from the
+ * resulting displacement.
+ * PRECONDITION:  Nodes must have updated displacements. */
+Eigen::Vector2d Element::interp_strain( double xi ) const
+{
+  // Calculate the strain components;
+  Eigen::Vector2d strain = Eigen::Vector2d::Zero( );
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
+    strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
+  return strain;
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* Given the number of points to print, interpolate the stresses from the
  * resulting displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
-std::vector<Eigen::Vector3d> Element::interp_stress( std::size_t num_pts) const
+std::vector<Eigen::Vector2d>
+Element::interp_strain( std::size_t num_pts ) const
+{
+  // Get the points over the parametric domain;
+  std::vector<double> xi = get_points( num_pts );
+
+  // Loop the points, interpolate the displacement, and return;
+  std::vector<Eigen::Vector2d> strain( num_pts );
+  for( std::size_t i{ 0 }; i != num_pts; ++i )
+    strain[i] = interp_strain( xi[i] );
+  return strain;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the number of points to print, interpolate the stresses from the
+ * resulting displacement.
+ * PRECONDITION:  Nodes must have updated displacements. */
+std::vector<Eigen::Vector3d>
+Element::interp_stress( std::size_t num_pts ) const
 {
   // Get the points over the parametric domain;
   std::vector<double> xi = get_points( num_pts );

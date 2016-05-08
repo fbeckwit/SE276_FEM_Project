@@ -27,11 +27,7 @@
 Eigen::Vector3d Disp_Ele::interp_stress( double xi ) const
 {
   // Calculate the strain components and pass to the material to get the stress;
-  Eigen::Vector2d strain;
-  strain.setZero( );
-  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
-    strain += get_gradient_matrix( xi, a ) * nodes[a]->disp;
-
+  Eigen::Vector2d strain = interp_strain( xi );
   return material->get_stress( strain );
 }
 
