@@ -27,7 +27,6 @@
 Eigen::MatrixXd Element::get_force_ext( ) const
 {
   Eigen::VectorXd force = Eigen::VectorXd::Zero( nodes.size( ) );
-  force.setZero( );
 
   // Check if node is on the natural boundary (Node::NBC) and calc the force;
   for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a ) {

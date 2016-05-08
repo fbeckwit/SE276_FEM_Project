@@ -108,8 +108,7 @@ std::size_t Domain::get_eqn_count( )
 Eigen::MatrixXd Domain::build_stiffness( std::size_t int_order )
 {
   // Resize the stiffness matrix;
-  Eigen::MatrixXd stiff( num_equations, num_equations );
-  stiff.setZero( );
+  Eigen::MatrixXd stiff = Eigen::MatrixXd::Zero( num_equations, num_equations );
 
   // Loop over elements, get each stiffness and assemble to global stiffness;
   for( std::vector<Element *>::const_iterator elem_it = elements.begin( );
@@ -143,8 +142,7 @@ Eigen::MatrixXd Domain::build_stiffness( std::size_t int_order )
 Eigen::VectorXd Domain::build_force( )
 {
   // Resize the force vector;
-  Eigen::VectorXd force( num_equations );
-  force.setZero( );
+  Eigen::VectorXd force = Eigen::VectorXd::Zero( num_equations );
 
   // Loop over the elements, get each external force and assemble to global;
   for( std::vector<Element *>::const_iterator elem_it = elements.begin( );
@@ -181,8 +179,7 @@ Eigen::VectorXd Domain::solve( std::size_t int_order )
   Eigen::VectorXd force = build_force( );
 
   // Solve system;
-  Eigen::VectorXd disp( num_equations );
-  disp.setZero( );
+  Eigen::VectorXd disp = Eigen::VectorXd::Zero( num_equations );
   disp = stiff.llt( ).solve( force );
 
   // Update the domain;
