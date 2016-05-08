@@ -185,8 +185,9 @@ Eigen::VectorXd Domain::solve( std::size_t int_order )
   disp.setZero( );
   disp = stiff.llt( ).solve( force );
 
-  // Update the nodes;
+  // Update the domain;
   update_nodes( disp );
+  update_elements( );
   return disp;
 }
 
@@ -252,10 +253,7 @@ void Domain::print_stress( std::ostream & out, std::size_t num_pts ) const
 void Domain::update_nodes( const Eigen::VectorXd & displacement )
 {
   // Loop over the nodes and update any necessary information;
-  for( std::vector<Node *>::iterator node_iter = nodes.begin( );
-      node_iter != nodes.end( ); ++node_iter ) {
-    Node *node = *node_iter;
-
+  for( auto node : nodes ) {
     // Check if the node is a DOF of the system;
     if( node->get_type( ) != Node::EBC ) {
       // Grab the global equation number and update the dipslacement;
@@ -263,6 +261,16 @@ void Domain::update_nodes( const Eigen::VectorXd & displacement )
       node->update_disp( displacement[A] );
     }
   }
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Update the element info.
+ * PRECONDITION:  Nodes must be updated. */
+void Domain::update_elements( )
+{
+  for( auto elem : elements )
+    elem->update( );
 }
 
 /* -------------------------------------------------------------------------- */

@@ -24,6 +24,7 @@ class Node {
 
   friend class Element;
   friend class Disp_Ele;
+  friend class UP_Ele;
 
 public:
 

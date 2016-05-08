@@ -35,8 +35,9 @@ public:
     k_eval( this ), g_eval( this ), m_eval( this )
   { }
 
-  UP_Ele( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
-    Element( id, nodes ), pressure( ), material( mat->clone( ) ),
+  UP_Ele( std::size_t id, std::vector<Node *> nodes,
+          std::size_t num_pres, const Material *mat ) :
+    Element( id, nodes ), pressure( num_pres, 0.0 ), material( mat->clone( ) ),
     k_eval( this ), g_eval( this ), m_eval( this )
   { }
 
@@ -74,6 +75,14 @@ public:
   /* Given the parametric coordinate, xi, and the node number, a, return the
    * divergence matrix, b^v. */
   double get_divergence_matrix( double xi, std::size_t a ) const;
+
+  /* Update the element info.
+   * PRECONDITION:  Element nodes must be updated. */
+  void update( );
+
+  /* Given the parametrix coordinate, xi, interpolate the pressure.
+   * PRECONDITION:  Pressures must be updated after solving. */
+  double interp_pressure( double xi ) const;
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */

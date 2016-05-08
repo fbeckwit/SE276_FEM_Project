@@ -46,7 +46,7 @@ Eigen::Vector3d UP_Ele::interp_stress( double xi ) const
   return Eigen::VectorXd::Zero( 3 );
 }
 
-/* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
+/* -------------------------------------------------------------------------- */
 
 /* Given the parametric coordinate, xi, and the node number, a, return the
  * divergence matrix, b^v. */
@@ -55,6 +55,43 @@ double UP_Ele::get_divergence_matrix( double xi, std::size_t a ) const
   // Get the gradient matrix and sum to get the divergence matrix at a;
   Eigen::Vector2d B_a = get_gradient_matrix( xi, a );
   return B_a.sum( );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Update the element info.
+ * PRECONDITION:  Element nodes must be updated. */
+void UP_Ele::update( )
+{
+  // Update the pressures.  Get the G & M matrices;
+  std::size_t int_order{ 2 }; // TODO:  hard-coded for now, remove later;
+  Eigen::MatrixXd G = quad::integrate_matrix( g_eval, int_order );
+  Eigen::MatrixXd M = quad::integrate_matrix( m_eval, int_order );
+
+  // Perform matrix mult to get discrete pressure operator;
+  Eigen::MatrixXd press_op = -( M.inverse( ) * G.transpose( ) );
+
+  // Create a displacement vector for the element;
+  Eigen::VectorXd disp = Eigen::VectorXd::Zero( nodes.size( ) );
+  for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
+    disp(a) = nodes[a]->disp;
+
+  // Calculate the pressures;
+  for( std::vector<double>::size_type a{ 0 }; a != pressure.size( ); ++a )
+    pressure[a] = ( press_op.row( a ) * disp ).value( );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the parametrix coordinate, xi, interpolate the pressure.
+ * PRECONDITION:  Pressures must be updated after solving. */
+double UP_Ele::interp_pressure( double xi ) const
+{
+  // Perform summation over the pressure coefficients and their interpolation;
+  double pres{ 0.0 };
+  for( std::vector<double>::size_type a{ 0 }; a != pressure.size( ); ++a )
+    pres += pressure_func( xi, a ) * pressure[a];
+  return pres;
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */

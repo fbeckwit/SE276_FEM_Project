@@ -167,6 +167,10 @@ private:
   /* Given a vector of displacements, update the nodes. */
   void update_nodes( const Eigen::VectorXd & displacement );
 
+  /* Update the element info.
+   * PRECONDITION:  Nodes must be updated. */
+  void update_elements( );
+
   /* Given a string, a field width, and an output stream, center the string and
    * print to the output. */
   void print_centered( const std::string & str,

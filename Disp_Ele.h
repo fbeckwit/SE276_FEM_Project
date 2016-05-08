@@ -70,6 +70,10 @@ public:
    * PRECONDITION:  Nodes must have updated displacements. */
   Eigen::Vector3d interp_stress( double xi ) const;
 
+  /* Update the element info.
+   * PRECONDITION:  Element nodes must be updated. */
+  void update( ) { ; }
+
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */
   virtual double shape_func( double xi, std::size_t a ) const = 0;

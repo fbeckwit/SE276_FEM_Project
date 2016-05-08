@@ -132,6 +132,10 @@ public:
    * function, a, return the value of the shape function derivative. */
   virtual double shape_deriv( double xi, std::size_t a ) const = 0;
 
+  /* Update the element info.
+   * PRECONDITION:  Element nodes must be updated. */
+  virtual void update( ) = 0;
+
   /* Given the local node number (and eventually DOF number), return the global
    * equation number using the `LM' array. */
   inline std::size_t location_matrix( std::size_t a ) const {
