@@ -26,7 +26,14 @@
  * consistent tangent. */
 Eigen::MatrixXd UP_Ele::get_stiffness( std::size_t int_order )
 {
-  return Eigen::MatrixXd::Zero( nodes.size( ), nodes.size( ) );
+  // Calculate the various matrices;
+  Eigen::MatrixXd stiff = util::integrate_matrix( k_eval, int_order, true );
+  Eigen::MatrixXd div_op = util::integrate_matrix( g_eval, int_order );
+  Eigen::MatrixXd constr_op = util::integrate_matrix( m_eval, int_order, true );
+
+  // Perform static condensation and return;
+  stiff -= ( div_op * constr_op.inverse( ) * div_op.transpose( ) );
+  return stiff;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -39,7 +46,7 @@ Eigen::Vector3d UP_Ele::interp_stress( double xi ) const
   return Eigen::VectorXd::Zero( 3 );
 }
 
-/* -------------------------------------------------------------------------- */
+/* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
 
 /* Given the parametric coordinate, xi, and the node number, a, return the
  * divergence matrix, b^v. */
@@ -51,29 +58,6 @@ double UP_Ele::get_divergence_matrix( double xi, std::size_t a ) const
 }
 
 /* ***********************  PRIVATE MEMBER FUNCTIONS  *********************** */
-
-/* Returns the stiffness matrix for the given element from the mu-part of the
- * current consistent tangent of the material. */
-Eigen::MatrixXd UP_Ele::get_K_mu( std::size_t int_order ) const
-{
-  return Eigen::MatrixXd::Zero( 1, 1 );
-}
-
-/* -------------------------------------------------------------------------- */
-
-/* Returns the discrete gradient operator, G, which acts on pressures. */
-Eigen::MatrixXd UP_Ele::get_G( std::size_t int_order ) const
-{
-  return Eigen::MatrixXd::Zero( 1, 1 );
-}
-
-/* -------------------------------------------------------------------------- */
-
-/* Returns the discrete constraint operator, M. */
-Eigen::MatrixXd UP_Ele::get_M( std::size_t int_order ) const
-{
-  return Eigen::MatrixXd::Zero( 1, 1 );
-}
 
 /* ************************  NESTED CLASS FUNCTIONS  ************************ */
 

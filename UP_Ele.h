@@ -32,24 +32,24 @@ public:
   /* Default constructor */
   UP_Ele( ) :
     Element( ), pressure( ), material( nullptr ),
-    stiff_eval( this ), g_eval( this ), m_eval( this )
+    k_eval( this ), g_eval( this ), m_eval( this )
   { }
 
   UP_Ele( std::size_t id, std::vector<Node *> nodes, const Material *mat ) :
     Element( id, nodes ), pressure( ), material( mat->clone( ) ),
-    stiff_eval( this ), g_eval( this ), m_eval( this )
+    k_eval( this ), g_eval( this ), m_eval( this )
   { }
 
   UP_Ele( const UP_Ele & other ) :
     Element( other ), pressure{ other.pressure },
     material{ other.material->clone( ) },
-    stiff_eval( this ), g_eval( this ), m_eval( this )
+    k_eval( this ), g_eval( this ), m_eval( this )
   { }
 
   UP_Ele( UP_Ele && other ) :
     Element( std::move( other ) ), pressure{ std::move( other.pressure ) },
     material{ other.material },
-    stiff_eval( this ), g_eval( this ), m_eval( this )
+    k_eval( this ), g_eval( this ), m_eval( this )
   {
     other.material = nullptr;
   }
@@ -99,13 +99,17 @@ private:
   /* ***************************  NESTED CLASSES  *************************** */
 
   /* Function object used in the evaluation of the stiffness matrix.  operator()
-   * overloaded to return the internal energy density at the evaluation point,
-   * xi. */
+   * overloaded to return the internal energy density (from the shear modulus)
+   * at the evaluation point, xi. */
   struct K_Func {
 
     /* Constructor */
     K_Func( const UP_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
 
+    /* Functions to query the size of the final matrix. */
+    std::size_t get_rows( ) const { return parent->nodes.size( ); }
+    std::size_t get_cols( ) const { return parent->nodes.size( ); }
+
     /* Calculate the internal energy density of the stiffness. */
     double operator()( double xi ) const;
 
@@ -114,11 +118,18 @@ private:
     std::size_t b;
   };
 
+  /* Function object used in the evaluation of the stiffness matrix.  operator()
+   * overloaded to return the internal energy density due to dilation at the
+   * evaluation point, xi. */
   struct G_Func {
     /* Constructor */
     G_Func( const UP_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
 
-    /* Calculate the internal energy density of the stiffness. */
+    /* Functions to query the size of the final matrix. */
+    std::size_t get_rows( ) const { return parent->nodes.size( ); }
+    std::size_t get_cols( ) const { return parent->pressure.size( ); }
+
+    /* Calculate the internal energy density of the dilation. */
     double operator()( double xi ) const;
 
     const UP_Ele * parent;
@@ -126,12 +137,19 @@ private:
     std::size_t b;
   };
 
+  /* Function object used in the evaluation of the stiffness matrix.  operator()
+   * overloaded to return the internal energy density due to the penalty
+   * constraint at the evaluation point, xi. */
   struct M_Func {
 
     /* Constructor */
     M_Func( const UP_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
 
-    /* Calculate the internal energy density of the stiffness. */
+    /* Functions to query the size of the final matrix. */
+    std::size_t get_rows( ) const { return parent->pressure.size( ); }
+    std::size_t get_cols( ) const { return parent->pressure.size( ); }
+
+    /* Calculate the internal energy density of the penalty constraint. */
     double operator()( double xi ) const;
 
     const UP_Ele * parent;
@@ -141,21 +159,11 @@ private:
 
   /* ************************  PRIVATE DATA MEMBERS  ************************ */
 
-  K_Func stiff_eval;
+  K_Func k_eval;
   G_Func g_eval;
   M_Func m_eval;
 
   /* *********************  PRIVATE MEMBERS FUNCTIONS  ********************** */
-
-  /* Returns the stiffness matrix for the given element from the mu-part of the
-   * current consistent tangent of the material. */
-  Eigen::MatrixXd get_K_mu( std::size_t int_order ) const;
-
-  /* Returns the discrete gradient operator, G, which acts on pressures. */
-  Eigen::MatrixXd get_G( std::size_t int_order ) const;
-
-  /* Returns the discrete constraint operator, M. */
-  Eigen::MatrixXd get_M( std::size_t int_order ) const;
 
 };
 

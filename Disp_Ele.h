@@ -94,9 +94,7 @@ private:
   struct K_Func {
 
     /* Constructor */
-    K_Func( const Disp_Ele * p, std::size_t _a = 0, std::size_t _b = 0 ) :
-      parent{ p }, a{ _a }, b{ _b }
-    { }
+    K_Func( const Disp_Ele * p ) : parent{ p }, a{ 0 }, b{ 0 } { }
 
     /* Functions to query the size of the final matrix. */
     std::size_t get_rows( ) const { return parent->nodes.size( ); }
