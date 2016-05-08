@@ -71,8 +71,9 @@ public:
    * PRECONDITION:  Nodes must have updated displacements. */
   Eigen::Vector3d interp_stress( double xi ) const;
 
-  /* Given the parametric coordinate, xi, return the divergence matrix, b^v. */
-  double get_divergence_matrix( double xi ) const;
+  /* Given the parametric coordinate, xi, and the node number, a, return the
+   * divergence matrix, b^v. */
+  double get_divergence_matrix( double xi, std::size_t a ) const;
 
   /* Given the parametric coordinate, xi, and the local index of the shape
    * function, a, return the value of the shape function. */

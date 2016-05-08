@@ -35,7 +35,7 @@ Eigen::Vector3d Disp_Ele::interp_stress( double xi ) const
   return material->get_stress( strain );
 }
 
-/* -------------------------------------------------------------------------- */
+/* ************************  NESTED CLASS FUNCTIONS  ************************ */
 
 double Disp_Ele::K_Func::operator()( double xi ) const
 {
