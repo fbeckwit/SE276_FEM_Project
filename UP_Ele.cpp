@@ -43,7 +43,14 @@ Eigen::MatrixXd UP_Ele::get_stiffness( std::size_t int_order )
  * PRECONDITION:  Nodes must have updated displacements. */
 Eigen::Vector3d UP_Ele::interp_stress( double xi ) const
 {
-  return Eigen::VectorXd::Zero( 3 );
+  // Interpolate the strain and pressure at the coordinate, xi;
+  Eigen::Vector2d strain = interp_strain( xi );
+  double press = interp_pressure( xi );
+
+  // Calculate the stress;
+  Eigen::Vector3d stress = material->get_stress_mu( strain );
+  stress += Eigen::Vector3d::Constant( press );
+  return stress;
 }
 
 /* -------------------------------------------------------------------------- */

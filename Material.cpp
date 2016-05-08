@@ -35,10 +35,22 @@ Eigen::Matrix2d Material::get_tangent( ) const
 Eigen::Vector3d Material::get_stress( const Eigen::Vector2d & strain ) const
 {
   // Calculate the stresses and return;
-  Eigen::Vector3d stress;
+  Eigen::Vector3d stress = Eigen::Vector3d::Zero( );
   stress[0] = ( lambda + 2 * mu ) * strain(0) + lambda * strain(1);
   stress[1] = ( lambda + 2 * mu ) * strain(1) + lambda * strain(0);
   stress[2] = lambda * ( strain(0) + strain(1) );
+  return stress;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Given the strain, return the resulting stress. */
+Eigen::Vector3d Material::get_stress_mu( const Eigen::Vector2d & strain ) const
+{
+  // Calculate the stresses and return;
+  Eigen::Vector3d stress = Eigen::Vector3d::Zero( );
+  for( std::size_t i{ 0 }; i != 2; ++i )
+    stress[i] = 2*mu * strain[i];
   return stress;
 }
 
