@@ -79,7 +79,7 @@ void Domain::create_element( std::vector<std::size_t> _nodes, std::size_t mat_id
   if( node_ptrs.size( ) == 2 )
     ele = new Linear_UP( ele_ID, node_ptrs, materials[mat_id] );
   else if( node_ptrs.size( ) == 3 )
-    ele = new Quadratic( ele_ID, node_ptrs, materials[mat_id] );
+    ele = new Quadratic_UP( ele_ID, node_ptrs, materials[mat_id] );
   else
     ; // TODO:  Throw an exception;
   elements.push_back( ele );

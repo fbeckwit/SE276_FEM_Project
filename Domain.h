@@ -20,6 +20,7 @@
 #include "Material.h"
 #include "Node.h"
 #include "Quadratic.h"
+#include "Quadratic_UP.h"
 
 // System headers;
 #include <Eigen/Cholesky>
