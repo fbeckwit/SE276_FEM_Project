@@ -23,7 +23,9 @@
 #include <cstddef>
 #include <vector>
 
-class Linear_UP : public UP_Ele {
+namespace fem {
+
+class Linear_UP : public fem::UP_Ele {
 
 public:
 
@@ -61,5 +63,7 @@ public:
   }
 
 };
+
+} // namespace fem;
 
 #endif

@@ -23,7 +23,7 @@
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function.  */
-double Quadratic_UP::shape_func( double xi, std::size_t a ) const
+double fem::Quadratic_UP::shape_func( double xi, std::size_t a ) const
 {
   if( a == 0 )
     return 0.5 * xi * ( xi - 1 );
@@ -39,7 +39,7 @@ double Quadratic_UP::shape_func( double xi, std::size_t a ) const
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function derivative. */
-double Quadratic_UP::shape_deriv( double xi, std::size_t a ) const
+double fem::Quadratic_UP::shape_deriv( double xi, std::size_t a ) const
 {
   if( a == 0 )
     return xi - 0.5;
@@ -55,7 +55,7 @@ double Quadratic_UP::shape_deriv( double xi, std::size_t a ) const
 
 /* Given the parametric coordinate, xi, and the local index of the pressure
  * shape function, a, return the value of the pressure function. */
-double Quadratic_UP::pressure_func( double xi, std::size_t a ) const
+double fem::Quadratic_UP::pressure_func( double xi, std::size_t a ) const
 {
   // Determine the integration location;
   double xi_a = ( a == 0 ? -1 : 1 ) / std::sqrt( 3.0 );

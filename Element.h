@@ -25,6 +25,8 @@
 #include <Eigen/LU>
 #include <utility>
 
+namespace fem {
+
 class Element {
 
 public:
@@ -241,5 +243,7 @@ private:
   static std::vector<double> get_points( std::size_t num_pts = 11 );
 
 };
+
+} // namespace fem;
 
 #endif

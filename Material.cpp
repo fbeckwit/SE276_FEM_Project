@@ -20,7 +20,7 @@
 /* ***********************  PUBLIC MEMBER FUNCTIONS  ************************ */
 
 /* Return the tangent elastic modulii tensor for the material. */
-Eigen::Matrix2d Material::get_tangent( ) const
+Eigen::Matrix2d fem::Material::get_tangent( ) const
 {
   // Create the tangent matrix, load the entries and return;
   Eigen::Matrix2d elastic_mod;
@@ -32,7 +32,8 @@ Eigen::Matrix2d Material::get_tangent( ) const
 /* -------------------------------------------------------------------------- */
 
 /* Given the strain, return the resulting stress. */
-Eigen::Vector3d Material::get_stress( const Eigen::Vector2d & strain ) const
+Eigen::Vector3d
+fem::Material::get_stress( const Eigen::Vector2d & strain ) const
 {
   // Calculate the stresses and return;
   Eigen::Vector3d stress = Eigen::Vector3d::Zero( );
@@ -45,7 +46,8 @@ Eigen::Vector3d Material::get_stress( const Eigen::Vector2d & strain ) const
 /* -------------------------------------------------------------------------- */
 
 /* Given the strain, return the resulting stress. */
-Eigen::Vector3d Material::get_stress_mu( const Eigen::Vector2d & strain ) const
+Eigen::Vector3d
+fem::Material::get_stress_mu( const Eigen::Vector2d & strain ) const
 {
   // Calculate the stresses and return;
   Eigen::Vector3d stress = Eigen::Vector3d::Zero( );

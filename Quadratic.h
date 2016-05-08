@@ -23,7 +23,9 @@
 #include <cstddef>
 #include <vector>
 
-class Quadratic : public Disp_Ele {
+namespace fem {
+
+class Quadratic : public fem::Disp_Ele {
 
 public:
 
@@ -51,5 +53,7 @@ public:
   virtual double shape_deriv( double xi, std::size_t a ) const;
 
 };
+
+} // namespace fem;
 
 #endif

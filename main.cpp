@@ -67,12 +67,12 @@ int main( int argc, char *argv[] )
 
   // Create domain nodes;
   std::cout << "\nCreating domain:\n    Nodes ...\n";
-  Domain domain;
+  fem::Domain domain;
   double elem_size = ( b - a ) / num_elem;
   for( std::size_t node_i{ 0 }; node_i != 2*num_elem + 1; ++node_i ) {
     double coord = a + node_i * elem_size / 2.0;
     if( node_i == 0 )
-      domain.create_node( coord, Node::NBC, P );
+      domain.create_node( coord, fem::Node::NBC, P );
     else
       domain.create_node( coord );
   }

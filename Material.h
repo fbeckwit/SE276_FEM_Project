@@ -20,6 +20,8 @@
 #include <Eigen/LU>
 #include <iostream>
 
+namespace fem {
+
 class Material {
 
 public:
@@ -64,5 +66,7 @@ private:
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
 };
+
+} // namespace fem;
 
 #endif

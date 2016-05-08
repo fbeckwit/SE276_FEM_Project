@@ -20,6 +20,8 @@
 #include <array>
 #include <vector>
 
+namespace fem {
+
 class Node {
 
   friend class Element;
@@ -68,5 +70,7 @@ private:
   /* **********************  PRIVATE MEMBER FUNCTIONS  ********************** */
 
 };
+
+} // namespace fem;
 
 #endif

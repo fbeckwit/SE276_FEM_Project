@@ -23,7 +23,9 @@
 #include <cstddef>
 #include <vector>
 
-class Quadratic_UP : public UP_Ele {
+namespace fem {
+
+class Quadratic_UP : public fem::UP_Ele {
 
 public:
 
@@ -55,5 +57,7 @@ public:
   virtual double pressure_func( double xi, std::size_t a ) const;
 
 };
+
+} // namespace fem;
 
 #endif

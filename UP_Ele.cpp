@@ -24,7 +24,7 @@
 
 /* Returns the stiffness matrix for the given element using the current
  * consistent tangent. */
-Eigen::MatrixXd UP_Ele::get_stiffness( std::size_t int_order )
+Eigen::MatrixXd fem::UP_Ele::get_stiffness( std::size_t int_order )
 {
   // Calculate the various matrices;
   Eigen::MatrixXd stiff = quad::integrate_matrix( k_eval, int_order, true );
@@ -41,7 +41,7 @@ Eigen::MatrixXd UP_Ele::get_stiffness( std::size_t int_order )
 /* Given the parametric coordinate, xi, return the stresses from the resulting
  * displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
-Eigen::Vector3d UP_Ele::interp_stress( double xi ) const
+Eigen::Vector3d fem::UP_Ele::interp_stress( double xi ) const
 {
   // Interpolate the strain and pressure at the coordinate, xi;
   Eigen::Vector2d strain = interp_strain( xi );
@@ -57,7 +57,7 @@ Eigen::Vector3d UP_Ele::interp_stress( double xi ) const
 
 /* Given the parametric coordinate, xi, and the node number, a, return the
  * divergence matrix, b^v. */
-double UP_Ele::get_divergence_matrix( double xi, std::size_t a ) const
+double fem::UP_Ele::get_divergence_matrix( double xi, std::size_t a ) const
 {
   // Get the gradient matrix and sum to get the divergence matrix at a;
   Eigen::Vector2d B_a = get_gradient_matrix( xi, a );
@@ -68,7 +68,7 @@ double UP_Ele::get_divergence_matrix( double xi, std::size_t a ) const
 
 /* Update the element info.
  * PRECONDITION:  Element nodes must be updated. */
-void UP_Ele::update( )
+void fem::UP_Ele::update( )
 {
   // Update the pressures.  Get the G & M matrices;
   std::size_t int_order{ 2 }; // TODO:  hard-coded for now, remove later;
@@ -92,7 +92,7 @@ void UP_Ele::update( )
 
 /* Given the parametrix coordinate, xi, interpolate the pressure.
  * PRECONDITION:  Pressures must be updated after solving. */
-double UP_Ele::interp_pressure( double xi ) const
+double fem::UP_Ele::interp_pressure( double xi ) const
 {
   // Perform summation over the pressure coefficients and their interpolation;
   double pres{ 0.0 };
@@ -105,7 +105,7 @@ double UP_Ele::interp_pressure( double xi ) const
 
 /* ************************  NESTED CLASS FUNCTIONS  ************************ */
 
-double UP_Ele::K_Func::operator()( double xi ) const
+double fem::UP_Ele::K_Func::operator()( double xi ) const
 {
   // Get required matrices and info;
   double mu = parent->material->get_mu( );
@@ -120,7 +120,7 @@ double UP_Ele::K_Func::operator()( double xi ) const
 
 /* -------------------------------------------------------------------------- */
 
-double UP_Ele::G_Func::operator()( double xi ) const
+double fem::UP_Ele::G_Func::operator()( double xi ) const
 {
   // Get required matrices and info;
   double radius = parent->interp_coord( xi );
@@ -134,7 +134,7 @@ double UP_Ele::G_Func::operator()( double xi ) const
 
 /* -------------------------------------------------------------------------- */
 
-double UP_Ele::M_Func::operator()( double xi ) const
+double fem::UP_Ele::M_Func::operator()( double xi ) const
 {
   // Get required matrices and info;
   double radius = parent->interp_coord( xi );

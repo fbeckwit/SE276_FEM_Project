@@ -22,7 +22,7 @@
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function.  */
-double Linear::shape_func( double xi, std::size_t a ) const
+double fem::Linear::shape_func( double xi, std::size_t a ) const
 {
   // Determine the appropriate value of xi_a;
   int xi_a = ( a == 0 ) ? -1 : 1;

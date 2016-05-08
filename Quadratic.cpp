@@ -22,7 +22,7 @@
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function.  */
-double Quadratic::shape_func( double xi, std::size_t a ) const
+double fem::Quadratic::shape_func( double xi, std::size_t a ) const
 {
   if( a == 0 )
     return 0.5 * xi * ( xi - 1 );
@@ -38,7 +38,7 @@ double Quadratic::shape_func( double xi, std::size_t a ) const
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the shape function derivative. */
-double Quadratic::shape_deriv( double xi, std::size_t a ) const
+double fem::Quadratic::shape_deriv( double xi, std::size_t a ) const
 {
   if( a == 0 )
     return xi - 0.5;

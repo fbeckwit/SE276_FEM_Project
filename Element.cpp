@@ -24,7 +24,7 @@
 
 /* Returns the external force acting on the element from tractions and body
  * forces. */
-Eigen::MatrixXd Element::get_force_ext( ) const
+Eigen::MatrixXd fem::Element::get_force_ext( ) const
 {
   Eigen::VectorXd force = Eigen::VectorXd::Zero( nodes.size( ) );
 
@@ -41,7 +41,7 @@ Eigen::MatrixXd Element::get_force_ext( ) const
 /* -------------------------------------------------------------------------- */
 
 /* Returns the internal force acting on the element due to strain energy. */
-Eigen::MatrixXd Element::get_force_int( ) const
+Eigen::MatrixXd fem::Element::get_force_int( ) const
 {
   return Eigen::MatrixXd( );
 }
@@ -49,7 +49,7 @@ Eigen::MatrixXd Element::get_force_int( ) const
 /* -------------------------------------------------------------------------- */
 
 /* Given an output stream, print the node locations. */
-void Element::print_nodes( std::ostream &out ) const
+void fem::Element::print_nodes( std::ostream &out ) const
 {
   for( std::vector<Node *>::size_type a{ 0 }; a != nodes.size( ); ++a )
     out << nodes[ a ]->get_coord( ) << '\n';
@@ -59,7 +59,7 @@ void Element::print_nodes( std::ostream &out ) const
 
 /* Given the parametric coordinate, xi, interpolate the coordinate within the
  * element. */
-double Element::interp_coord( double xi ) const
+double fem::Element::interp_coord( double xi ) const
 {
   // Sum N_a * x_a;
   double coord{0};
@@ -72,7 +72,7 @@ double Element::interp_coord( double xi ) const
 
 /* Given the number of points to print, interpolate the coordinates within the
  * element. */
-std::vector<double> Element::interp_coord( std::size_t num_pts) const
+std::vector<double> fem::Element::interp_coord( std::size_t num_pts) const
 {
   // Get the points over the parametric domain;
   std::vector<double> xi = get_points( num_pts );
@@ -88,7 +88,7 @@ std::vector<double> Element::interp_coord( std::size_t num_pts) const
 
 /* Given the parametric coordinate, xi, interpolate the derivative of the
  * coordinate within the element. */
-double Element::interp_coord_deriv( double xi ) const
+double fem::Element::interp_coord_deriv( double xi ) const
 {
   // Sum dN_a * x_a;
   double coord_deriv{0};
@@ -101,7 +101,7 @@ double Element::interp_coord_deriv( double xi ) const
 
 /* Given the number of points to print, interpolate the derivatives of the
  * coordinates within the element. */
-std::vector<double> Element::interp_coord_deriv( std::size_t num_pts) const
+std::vector<double> fem::Element::interp_coord_deriv( std::size_t num_pts) const
 {
   // Get the points over the parametric domain;
   std::vector<double> xi = get_points( num_pts );
@@ -117,7 +117,7 @@ std::vector<double> Element::interp_coord_deriv( std::size_t num_pts) const
 
 /* Given the parametric coordinate, xi, interpolate the displacement within the
  * element. */
-double Element::interp_disp( double xi ) const
+double fem::Element::interp_disp( double xi ) const
 {
   // Sum N_a * d_a;
   double disp{0};
@@ -131,7 +131,7 @@ double Element::interp_disp( double xi ) const
 /* Given the number of points to print, interpolate the displacements within the
  * element.
  * PRECONDITION:  Nodes must have updated displacements. */
-std::vector<double> Element::interp_disp( std::size_t num_pts) const
+std::vector<double> fem::Element::interp_disp( std::size_t num_pts) const
 {
   // Get the points over the parametric domain;
   std::vector<double> xi = get_points( num_pts );
@@ -148,7 +148,7 @@ std::vector<double> Element::interp_disp( std::size_t num_pts) const
 /* Given the parametric coordinate, xi, interpolate the stresses from the
  * resulting displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
-Eigen::Vector2d Element::interp_strain( double xi ) const
+Eigen::Vector2d fem::Element::interp_strain( double xi ) const
 {
   // Calculate the strain components;
   Eigen::Vector2d strain = Eigen::Vector2d::Zero( );
@@ -163,7 +163,7 @@ Eigen::Vector2d Element::interp_strain( double xi ) const
  * resulting displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
 std::vector<Eigen::Vector2d>
-Element::interp_strain( std::size_t num_pts ) const
+fem::Element::interp_strain( std::size_t num_pts ) const
 {
   // Get the points over the parametric domain;
   std::vector<double> xi = get_points( num_pts );
@@ -181,7 +181,7 @@ Element::interp_strain( std::size_t num_pts ) const
  * resulting displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
 std::vector<Eigen::Vector3d>
-Element::interp_stress( std::size_t num_pts ) const
+fem::Element::interp_stress( std::size_t num_pts ) const
 {
   // Get the points over the parametric domain;
   std::vector<double> xi = get_points( num_pts );
@@ -197,7 +197,8 @@ Element::interp_stress( std::size_t num_pts ) const
 
 /* Given the parametric coordinate, xi, and the local index of the shape
  * function, a, return the value of the gradient matrix, B. */
-Eigen::VectorXd Element::get_gradient_matrix( double xi, std::size_t a ) const
+Eigen::VectorXd
+fem::Element::get_gradient_matrix( double xi, std::size_t a ) const
 {
   // Calculate coefficients used in gradient matrix;
   double radius = interp_coord( xi );
@@ -217,7 +218,7 @@ Eigen::VectorXd Element::get_gradient_matrix( double xi, std::size_t a ) const
 
 /* Given the number of intervals, return a set of equally spaced points over the
  * parametric domain. */
-std::vector<double> Element::get_points( std::size_t num_pts )
+std::vector<double> fem::Element::get_points( std::size_t num_pts )
 {
   // Get interval size;
   double cell_size = 2.0 / ( num_pts - 1 );

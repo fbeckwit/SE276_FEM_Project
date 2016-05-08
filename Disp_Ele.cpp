@@ -24,7 +24,7 @@
 /* Given the parametric coordinate, xi, return the stresses from the resulting
  * displacement.
  * PRECONDITION:  Nodes must have updated displacements. */
-Eigen::Vector3d Disp_Ele::interp_stress( double xi ) const
+Eigen::Vector3d fem::Disp_Ele::interp_stress( double xi ) const
 {
   // Calculate the strain components and pass to the material to get the stress;
   Eigen::Vector2d strain = interp_strain( xi );
@@ -33,7 +33,7 @@ Eigen::Vector3d Disp_Ele::interp_stress( double xi ) const
 
 /* ************************  NESTED CLASS FUNCTIONS  ************************ */
 
-double Disp_Ele::K_Func::operator()( double xi ) const
+double fem::Disp_Ele::K_Func::operator()( double xi ) const
 {
   // Get required matrices and info;
   Eigen::Matrix2d elastic_mod = parent->material->get_tangent( );

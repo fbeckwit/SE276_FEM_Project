@@ -24,7 +24,9 @@
 #include <Eigen/LU>
 #include <utility>
 
-class UP_Ele : public Element {
+namespace fem {
+
+class UP_Ele : public fem::Element {
 
 public:
 
@@ -175,5 +177,7 @@ private:
   /* *********************  PRIVATE MEMBERS FUNCTIONS  ********************** */
 
 };
+
+} // namespace fem;
 
 #endif

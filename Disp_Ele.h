@@ -27,7 +27,9 @@
 #include <Eigen/LU>
 #include <utility>
 
-class Disp_Ele : public Element {
+namespace fem {
+
+class Disp_Ele : public fem::Element {
 
 public:
 
@@ -118,5 +120,7 @@ private:
   K_Func stiff_eval;
 
 };
+
+} // namespace fem;
 
 #endif

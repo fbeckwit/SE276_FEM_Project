@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+namespace fem {
+
 class Domain {
 
 public:
@@ -179,5 +181,7 @@ private:
       std::size_t width, std::ostream & out, bool trim = false ) const;
 
 };
+
+} // namespace fem;
 
 #endif
