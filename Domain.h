@@ -16,6 +16,7 @@
 
 // Project-specific headers;
 #include "Linear.h"
+#include "Linear_UP.h"
 #include "Material.h"
 #include "Node.h"
 #include "Quadratic.h"
