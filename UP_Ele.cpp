@@ -27,9 +27,9 @@
 Eigen::MatrixXd UP_Ele::get_stiffness( std::size_t int_order )
 {
   // Calculate the various matrices;
-  Eigen::MatrixXd stiff = util::integrate_matrix( k_eval, int_order, true );
-  Eigen::MatrixXd div_op = util::integrate_matrix( g_eval, int_order );
-  Eigen::MatrixXd constr_op = util::integrate_matrix( m_eval, int_order, true );
+  Eigen::MatrixXd stiff = quad::integrate_matrix( k_eval, int_order, true );
+  Eigen::MatrixXd div_op = quad::integrate_matrix( g_eval, int_order );
+  Eigen::MatrixXd constr_op = quad::integrate_matrix( m_eval, int_order, true );
 
   // Perform static condensation and return;
   stiff -= ( div_op * constr_op.inverse( ) * div_op.transpose( ) );

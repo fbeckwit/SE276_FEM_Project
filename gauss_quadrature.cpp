@@ -17,7 +17,7 @@
 #include <cmath>
 
 /* Given the order of integration, return the gauss point locations. */
-std::vector<double> util::get_gauss_pts( int order )
+std::vector<double> quad::get_gauss_pts( int order )
 {
   std::vector<double> legendre_roots;
 
@@ -2433,7 +2433,7 @@ std::vector<double> util::get_gauss_pts( int order )
 
 /* Given the integration order and the ends of the integration interval, return
  * the integration points moved & scaled to the correct interval. */
-std::vector<double> util::get_gauss_pts(
+std::vector<double> quad::get_gauss_pts(
     int order,
     const std::array<double, 2> & interval_ends
     )
@@ -2452,7 +2452,7 @@ std::vector<double> util::get_gauss_pts(
 /* -------------------------------------------------------------------------- */
 
 /* Given the order of integration, return the gauss weights. */
-std::vector<double> util::get_gauss_wts( int order )
+std::vector<double> quad::get_gauss_wts( int order )
 {
   std::vector<double> quadrature_weights;
 
@@ -4868,7 +4868,7 @@ std::vector<double> util::get_gauss_wts( int order )
 
 /* Given the integration order and the ends of the integration interval, return
  * the integration weights scaled to the correct interval. */
-std::vector<double> util::get_gauss_wts(
+std::vector<double> quad::get_gauss_wts(
     int order,
     const std::array<double, 2> & interval_ends
     )
@@ -4886,7 +4886,7 @@ std::vector<double> util::get_gauss_wts(
 
 /* Given a vector of values and a vector of weights, carry out the summation to
  * compute the integral. */
-double util::integrate( const std::vector<double> & values,
+double quad::integrate( const std::vector<double> & values,
     const std::vector<double> & weights )
 {
   // Loop and sum
@@ -4901,7 +4901,7 @@ double util::integrate( const std::vector<double> & values,
 /* Unit tester for the Gauss integration.  Given the number of polynomial tests
  * to perform, loop through and calculate the numerical quadrature and compare
  * to the exact integral. */
-void util::test( int num_tests )
+void quad::test( int num_tests )
 {
   // test the quadrature routines
   //    evaluate the integral of various orders of functions over range {0,1}
@@ -4952,7 +4952,7 @@ void util::test( int num_tests )
 /* Unit tester for the Gauss integration.  Given the polynomial order to
  * integrate and the number of intervals to integrate over, compute the integral
  * of the function 1/x^(poly_order). */
-double util::test_order( int poly_order, int num_intervals )
+double quad::test_order( int poly_order, int num_intervals )
 {
   // Calculate cell attributes;
   double eval_len = 1.0;

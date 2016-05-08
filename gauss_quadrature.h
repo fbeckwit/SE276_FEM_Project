@@ -13,7 +13,7 @@
 #include <vector>
 #include <Eigen/Dense>
 
-namespace util {
+namespace quad {
 
   std::vector<double> get_gauss_pts( int order );
   std::vector<double> get_gauss_pts(
@@ -51,7 +51,7 @@ namespace util {
 /* *************************  TEMPLATED FUNCTIONS  ************************** */
 
 template <typename Func>
-double util::integrate( const Func & f, int int_order )
+double quad::integrate( const Func & f, int int_order )
 {
   // Get integration points and weights;
   std::vector<double> points  = get_gauss_pts( int_order );
@@ -70,7 +70,7 @@ double util::integrate( const Func & f, int int_order )
  * integrate each term, func, integrate the coefficients and return the
  * matrix. */
 template <typename Matrix_Func>
-Eigen::MatrixXd util::integrate_matrix(
+Eigen::MatrixXd quad::integrate_matrix(
     Matrix_Func &func,
     int int_order,
     bool sym
@@ -87,7 +87,7 @@ Eigen::MatrixXd util::integrate_matrix(
     for( ; b != num_cols; ++b ) {
       func.a = a;
       func.b = b;
-      matrix( a, b ) = util::integrate( func, int_order );
+      matrix( a, b ) = quad::integrate( func, int_order );
 
       // If symmetric, then copy the M_{ab} term to M_{ba};
       if( a != b && sym )
